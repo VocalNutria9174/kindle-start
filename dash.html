@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kindle Dashboard</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #ffffff;
+    font-family: Georgia, 'Times New Roman', serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* Rotation wrapper */
+  #rotation-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    height: 100vh;
+    transition: transform 0.4s ease;
+  }
+
+  #rotation-wrapper.rotate-90  { transform: rotate(90deg);  width: 100vh; height: 100vw; }
+  #rotation-wrapper.rotate-180 { transform: rotate(180deg); }
+  #rotation-wrapper.rotate-270 { transform: rotate(270deg); width: 100vh; height: 100vw; }
+
+  /* Grid layout */
+  .dashboard {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 18px;
+    padding: 24px;
+    max-width: 760px;
+    width: 100%;
+  }
+
+  /* Card base */
+  .card {
+    background: #1a1a1a;
+    border-radius: 22px;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ============ CLOCK ============ */
+  .clock-card { grid-column: 1; grid-row: 1; aspect-ratio: 1; }
+
+  .clock-face {
+    width: 90%;
+    aspect-ratio: 1;
+    background: #ffffff;
+    border-radius: 50%;
+    position: relative;
+    box-shadow: inset 0 0 0 3px #e0e0e0;
+  }
+
+  /* Tick marks */
+  .tick {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform-origin: 0 0;
+    width: 2px;
+    border-radius: 2px;
+    background: #9a9a9a;
+  }
+  .tick.major {
+    width: 3px;
+    background: #555;
+  }
+
+  /* Hands */
+  .hand {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform-origin: bottom center;
+    border-radius: 4px;
+  }
+  .hour-hand {
+    width: 4.5px;
+    height: 27%;
+    background: #1a1a1a;
+    margin-left: -2.25px;
+    margin-top: -27%;
+    border-radius: 3px 3px 2px 2px;
+  }
+  .minute-hand {
+    width: 3px;
+    height: 36%;
+    background: #1a1a1a;
+    margin-left: -1.5px;
+    margin-top: -36%;
+    border-radius: 3px 3px 2px 2px;
+  }
+  .second-hand {
+    width: 1.5px;
+    height: 39%;
+    background: #c8860a;
+    margin-left: -0.75px;
+    margin-top: -39%;
+    border-radius: 2px;
+  }
+  .center-dot {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #c8860a;
+    border-radius: 50%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+  }
+  .center-dot-inner {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #1a1a1a;
+    border-radius: 50%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 11;
+  }
+
+  /* Digital time label */
+  .time-label {
+    margin-top: 17px;
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    color: #aaaaaa;
+    font-family: 'Courier New', monospace;
+  }
+
+  /* ============ CALENDAR ============ */
+  .calendar-card {
+    grid-column: 2;
+    grid-row: 1;
+    aspect-ratio: 1;
+    padding: 14px 15px;
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  .cal-header {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 10px;
+    width: 100%;
+  }
+  .cal-month {
+    font-size: 14px;
+    font-weight: bold;
+    color: #e05555;
+    letter-spacing: 0.10em;
+    font-family: Helvetica, Arial, sans-serif;
+  }
+  .cal-year {
+    font-size: 14px;
+    color: #888888;
+    letter-spacing: 0.06em;
+    font-family: Helvetica, Arial, sans-serif;
+    font-weight: 300;
+  }
+
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    width: 100%;
+  }
+  .cal-day-name {
+    text-align: center;
+    font-size: 9px;
+    color: #777777;
+    font-family: Helvetica, Arial, sans-serif;
+    letter-spacing: 0.08em;
+    padding: 2px 0;
+    font-weight: 600;
+  }
+  .cal-day {
+    text-align: center;
+    font-size: 11px;
+    color: #cccccc;
+    font-family: Helvetica, Arial, sans-serif;
+    padding: 3px 1px;
+    border-radius: 50%;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 400;
+  }
+  .cal-day.today {
+    background: #e05555;
+    color: #ffffff;
+    font-weight: bold;
+    border-radius: 50%;
+  }
+  .cal-day.empty { color: transparent; }
+  .cal-day.other-month { color: #444444; }
+
+  /* ============ WEATHER ============ */
+  .weather-card {
+    grid-column: 3;
+    grid-row: 1;
+    aspect-ratio: 1;
+    gap: 6px;
+    padding: 16px;
+  }
+
+  .weather-city {
+    font-size: 11px;
+    color: #888888;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-family: 'Courier New', monospace;
+    text-align: center;
+  }
+  .weather-icon {
+    font-size: 36px;
+    line-height: 1;
+    margin: 4px 0;
+  }
+  .weather-temp {
+    font-size: 30px;
+    font-weight: bold;
+    color: #ffffff;
+    font-family: Georgia, serif;
+    letter-spacing: -0.02em;
+  }
+  .weather-desc {
+    font-size: 10px;
+    color: #aaaaaa;
+    text-align: center;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .weather-meta {
+    display: flex;
+    gap: 12px;
+    margin-top: 4px;
+  }
+  .weather-meta-item {
+    font-size: 9px;
+    color: #666666;
+    font-family: 'Courier New', monospace;
+    text-align: center;
+    letter-spacing: 0.04em;
+  }
+  .weather-meta-item span {
+    display: block;
+    color: #aaaaaa;
+    font-size: 10px;
+    margin-top: 2px;
+  }
+  .weather-loading {
+    font-size: 10px;
+    color: #666;
+    font-family: 'Courier New', monospace;
+    text-align: center;
+  }
+  .weather-error {
+    font-size: 10px;
+    color: #cc5555;
+    font-family: 'Courier New', monospace;
+    text-align: center;
+  }
+
+  /* ============ SETTINGS ============ */
+  .settings-bar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    margin-top: 6px;
+    flex-wrap: wrap;
+  }
+
+  .settings-btn {
+    background: #1a1a1a;
+    border: none;
+    border-radius: 12px;
+    color: #aaaaaa;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    padding: 8px 14px;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    transition: background 0.2s, color 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .settings-btn:active, .settings-btn.active {
+    background: #333333;
+    color: #ffffff;
+  }
+
+  /* Settings panel */
+  .settings-panel {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+  .settings-panel.open { display: flex; }
+
+  .settings-box {
+    background: #1a1a1a;
+    border-radius: 20px;
+    padding: 28px 32px;
+    min-width: 280px;
+    color: #cccccc;
+    font-family: 'Courier New', monospace;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .settings-box h2 {
+    font-size: 14px;
+    letter-spacing: 0.12em;
+    color: #ffffff;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    font-family: Georgia, serif;
+  }
+  .settings-box label {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: #777;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 5px;
+  }
+  .settings-box input, .settings-box select {
+    width: 100%;
+    background: #2a2a2a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    color: #cccccc;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    padding: 8px 12px;
+    outline: none;
+  }
+  .settings-box input:focus, .settings-box select:focus {
+    border-color: #555;
+  }
+  .settings-save {
+    background: #e05555;
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    padding: 10px;
+    cursor: pointer;
+    text-transform: uppercase;
+  }
+  .settings-close {
+    background: #2a2a2a;
+    border: none;
+    border-radius: 10px;
+    color: #aaa;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    padding: 10px;
+    cursor: pointer;
+    text-transform: uppercase;
+  }
+  .settings-row { display: flex; gap: 8px; }
+  .settings-row > * { flex: 1; }
+</style>
+</head>
+<body>
+
+<div id="rotation-wrapper">
+  <div class="dashboard">
+
+    <!-- CLOCK -->
+    <div class="card clock-card">
+      <div class="clock-face" id="clockFace">
+        <!-- ticks injected by JS -->
+        <div class="hand hour-hand"   id="hourHand"></div>
+        <div class="hand minute-hand" id="minuteHand"></div>
+        <div class="hand second-hand" id="secondHand"></div>
+        <div class="center-dot"><div class="center-dot-inner"></div></div>
+      </div>
+      <div class="time-label" id="timeLabel">--:-- --</div>
+    </div>
+
+    <!-- CALENDAR -->
+    <div class="card calendar-card" id="calendarCard">
+      <!-- built by JS -->
+    </div>
+
+    <!-- WEATHER -->
+    <div class="card weather-card" id="weatherCard">
+      <div class="weather-loading">Loading weather…</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Settings bar (outside rotation so it stays accessible) -->
+<div style="position:fixed;bottom:16px;left:0;right:0;display:flex;justify-content:center;z-index:50;">
+  <div class="settings-bar">
+    <button class="settings-btn" onclick="openSettings()">⚙ Settings</button>
+  </div>
+  </div>
+<!-- Settings Panel -->
+<div class="settings-panel" id="settingsPanel">
+  <div class="settings-box">
+    <h2>Dashboard Settings</h2>
+
+    <div>
+      <label>City Name</label>
+      <input type="text" id="settingCity" placeholder="e.g. Atlanta" />
+    </div>
+
+    <div>
+      <label>Temperature Unit</label>
+      <select id="settingUnit">
+        <option value="imperial">Fahrenheit (°F)</option>
+        <option value="metric">Celsius (°C)</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Page Rotation</label>
+      <select id="settingRotation">
+        <option value="0">Normal (0°)</option>
+        <option value="90">90° Clockwise</option>
+        <option value="180">Upside Down (180°)</option>
+        <option value="270">90° Counter-Clockwise</option>
+      </select>
+    </div>
+
+    <div class="settings-row">
+      <button class="settings-save" onclick="saveSettings()">Save</button>
+      <button class="settings-close" onclick="closeSettings()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── STORAGE ─────────────────────────────────────────────────────────────────
+const STORAGE_KEY = 'kindle_dashboard_v1';
+
+function loadPrefs() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+  } catch { return {}; }
+}
+
+function savePrefs(obj) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+}
+
+let prefs = loadPrefs();
+if (!prefs.city)     prefs.city     = 'Atlanta';
+if (!prefs.unit)     prefs.unit     = 'imperial';
+if (!prefs.rotation) prefs.rotation = '0';
+
+// ─── SETTINGS UI ─────────────────────────────────────────────────────────────
+function openSettings() {
+  document.getElementById('settingCity').value     = prefs.city;
+  document.getElementById('settingUnit').value     = prefs.unit;
+  document.getElementById('settingRotation').value = prefs.rotation;
+  document.getElementById('settingsPanel').classList.add('open');
+}
+
+function closeSettings() {
+  document.getElementById('settingsPanel').classList.remove('open');
+}
+
+function saveSettings() {
+  prefs.city     = document.getElementById('settingCity').value.trim() || 'Atlanta';
+  prefs.unit     = document.getElementById('settingUnit').value;
+  prefs.rotation = document.getElementById('settingRotation').value;
+  savePrefs(prefs);
+  closeSettings();
+  applyRotation();
+  fetchWeather();
+}
+
+// ─── ROTATION ────────────────────────────────────────────────────────────────
+const rotations = ['0','90','180','270'];
+
+function applyRotation() {
+  const w = document.getElementById('rotation-wrapper');
+  w.className = '';
+  if (prefs.rotation !== '0') w.classList.add('rotate-' + prefs.rotation);
+}
+
+function cycleRotation() {
+  const idx = rotations.indexOf(prefs.rotation);
+  prefs.rotation = rotations[(idx + 1) % rotations.length];
+  savePrefs(prefs);
+  applyRotation();
+}
+
+// ─── CLOCK ───────────────────────────────────────────────────────────────────
+(function buildTicks() {
+  const face = document.getElementById('clockFace');
+  const r = 50; // radius % from center
+  for (let i = 0; i < 60; i++) {
+    const angle = (i / 60) * 360;
+    const isMajor = i % 5 === 0;
+    const len = isMajor ? 8 : 5;
+    const tick = document.createElement('div');
+    tick.className = 'tick' + (isMajor ? ' major' : '');
+    const rad = (angle - 90) * Math.PI / 180;
+    // position from center outward
+    const cx = 50 + r * Math.cos(rad);
+    const cy = 50 + r * Math.sin(rad);
+    tick.style.cssText = `
+      position:absolute;
+      left:${cx}%;
+      top:${cy}%;
+      height:${len}%;
+      transform:translate(-50%,-100%) rotate(${angle}deg);
+      transform-origin: 50% 100%;
+    `;
+    face.appendChild(tick);
+  }
+})();
+
+function updateClock() {
+  const now    = new Date();
+  const s      = now.getSeconds();
+  const m      = now.getMinutes();
+  const h      = now.getHours() % 12;
+
+  const sDeg = s * 6;
+  const mDeg = m * 6 + s * 0.1;
+  const hDeg = h * 30 + m * 0.5;
+
+  document.getElementById('secondHand').style.transform = `translateX(-50%) rotate(${sDeg}deg)`;
+  document.getElementById('minuteHand').style.transform = `translateX(-50%) rotate(${mDeg}deg)`;
+  document.getElementById('hourHand').style.transform   = `translateX(-50%) rotate(${hDeg}deg)`;
+
+  // Digital label
+  let hr = now.getHours(), ampm = 'AM';
+  if (hr >= 12) { ampm = 'PM'; if (hr > 12) hr -= 12; }
+  if (hr === 0) hr = 12;
+  const mm = String(m).padStart(2,'0');
+  document.getElementById('timeLabel').textContent = `${hr}:${mm} ${ampm}`;
+}
+
+setInterval(updateClock, 1000);
+updateClock();
+
+// ─── CALENDAR ────────────────────────────────────────────────────────────────
+function buildCalendar() {
+  const card  = document.getElementById('calendarCard');
+  const now   = new Date();
+  const year  = now.getFullYear();
+  const month = now.getMonth();
+  const today = now.getDate();
+
+  const monthNames = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE',
+                      'JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+  const dayNames   = ['S','M','T','W','T','F','S'];
+
+  const firstDay  = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  let html = `
+    <div class="cal-header">
+      <span class="cal-month">${monthNames[month]}</span>
+      <span class="cal-year">${year}</span>
+    </div>
+    <div class="cal-grid">
+  `;
+
+  dayNames.forEach(d => html += `<div class="cal-day-name">${d}</div>`);
+
+  for (let i = 0; i < firstDay; i++) html += `<div class="cal-day empty"></div>`;
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const isToday = d === today;
+    html += `<div class="cal-day${isToday ? ' today' : ''}">${d}</div>`;
+  }
+
+  const remainder = (firstDay + daysInMonth) % 7;
+  if (remainder > 0) {
+    for (let i = 0; i < (7 - remainder); i++)
+      html += `<div class="cal-day other-month"></div>`;
+  }
+
+  html += '</div>';
+  card.innerHTML = html;
+}
+
+buildCalendar();
+
+// ─── WEATHER ─────────────────────────────────────────────────────────────────
+const API_KEY = '0264a07ef00385ae3a6ea69858c85c52';
+
+const weatherIcons = {
+  'Clear': '☀️',
+  'Clouds': '☁️',
+  'Rain': '🌧️',
+  'Drizzle': '🌦️',
+  'Thunderstorm': '⛈️',
+  'Snow': '❄️',
+  'Mist': '🌫️',
+  'Fog': '🌫️',
+  'Haze': '🌫️',
+  'Smoke': '🌫️',
+  'Dust': '💨',
+  'Sand': '💨',
+  'Ash': '🌋',
+  'Squall': '💨',
+  'Tornado': '🌪️',
+};
+
+function fetchWeather() {
+  var card = document.getElementById('weatherCard');
+  var city = prefs.city;
+  var unit = prefs.unit;
+  var unitSymbol = unit === 'imperial' ? '°F' : '°C';
+
+  card.innerHTML = '<div class="weather-loading">Fetching weather\u2026</div>';
+
+  var url = 'https://api.openweathermap.org/data/2.5/weather?q=' + encodeURIComponent(city) + '&appid=' + API_KEY + '&units=' + unit;
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', url, true);
+  xhr.timeout = 15000;
+
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState !== 4) return;
+
+    if (xhr.status === 200) {
+      try {
+        var data = JSON.parse(xhr.responseText);
+        var main      = data.weather[0].main;
+        var desc      = data.weather[0].description;
+        var temp      = Math.round(data.main.temp);
+        var feelsLike = Math.round(data.main.feels_like);
+        var humidity  = data.main.humidity;
+        var windSpeed = Math.round(data.wind.speed);
+        var wind      = unit === 'imperial' ? windSpeed + ' mph' : windSpeed + ' m/s';
+        var icon      = weatherIcons[main] || '\uD83C\uDF21';
+        var cityDisp  = data.name.toUpperCase();
+
+        card.innerHTML =
+          '<div class="weather-city">' + cityDisp + '</div>' +
+          '<div class="weather-icon">' + icon + '</div>' +
+          '<div class="weather-temp">' + temp + unitSymbol + '</div>' +
+          '<div class="weather-desc">' + desc + '</div>' +
+          '<div class="weather-meta">' +
+            '<div class="weather-meta-item">FEELS<span>' + feelsLike + unitSymbol + '</span></div>' +
+            '<div class="weather-meta-item">HUM<span>' + humidity + '%</span></div>' +
+            '<div class="weather-meta-item">WIND<span>' + wind + '</span></div>' +
+          '</div>';
+      } catch (e) {
+        card.innerHTML = '<div class="weather-error">\u26A0 Parse error</div>';
+      }
+    } else if (xhr.status === 404) {
+      card.innerHTML = '<div class="weather-error">\u26A0 City not found<br><br><small style="color:#555">Check city name in settings</small></div>';
+    } else if (xhr.status === 401) {
+      card.innerHTML = '<div class="weather-error">\u26A0 Invalid API key</div>';
+    } else {
+      card.innerHTML = '<div class="weather-error">\u26A0 Error ' + xhr.status + '<br><br><small style="color:#555">Check your connection</small></div>';
+    }
+  };
+
+  xhr.ontimeout = function() {
+    card.innerHTML = '<div class="weather-error">\u26A0 Request timed out<br><br><small style="color:#555">Check your connection</small></div>';
+  };
+
+  xhr.onerror = function() {
+    card.innerHTML = '<div class="weather-error">\u26A0 Network error<br><br><small style="color:#555">Check your connection</small></div>';
+  };
+
+  xhr.send();
+}
+
+// Refresh weather every 10 minutes
+fetchWeather();
+setInterval(fetchWeather, 10 * 60 * 1000);
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+applyRotation();
+</script>
+</body>
+</html>
