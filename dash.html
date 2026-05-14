@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -62,80 +62,13 @@
   .clock-face {
     width: 90%;
     aspect-ratio: 1;
-    background: #ffffff;
-    border-radius: 50%;
     position: relative;
-    box-shadow: inset 0 0 0 3px #e0e0e0;
   }
 
-  /* Tick marks */
-  .tick {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform-origin: 0 0;
-    width: 2px;
-    border-radius: 2px;
-    background: #9a9a9a;
-  }
-  .tick.major {
-    width: 3px;
-    background: #555;
-  }
-
-  /* Hands */
-  .hand {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform-origin: bottom center;
-    border-radius: 4px;
-  }
-  .hour-hand {
-    width: 4.5px;
-    height: 27%;
-    background: #1a1a1a;
-    margin-left: -2.25px;
-    margin-top: -27%;
-    border-radius: 3px 3px 2px 2px;
-  }
-  .minute-hand {
-    width: 3px;
-    height: 36%;
-    background: #1a1a1a;
-    margin-left: -1.5px;
-    margin-top: -36%;
-    border-radius: 3px 3px 2px 2px;
-  }
-  .second-hand {
-    width: 1.5px;
-    height: 39%;
-    background: #c8860a;
-    margin-left: -0.75px;
-    margin-top: -39%;
-    border-radius: 2px;
-  }
-  .center-dot {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    background: #c8860a;
-    border-radius: 50%;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 10;
-  }
-  .center-dot-inner {
-    position: absolute;
-    width: 4px;
-    height: 4px;
-    background: #1a1a1a;
-    border-radius: 50%;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 11;
+  .clock-face svg {
+    width: 100%;
+    height: 100%;
+    display: block;
   }
 
   /* Digital time label */
@@ -146,6 +79,7 @@
     color: #aaaaaa;
     font-family: 'Courier New', monospace;
   }
+
 
   /* ============ CALENDAR ============ */
   .calendar-card {
@@ -254,9 +188,11 @@
     text-transform: uppercase;
   }
   .weather-meta {
-    display: flex;
-    gap: 12px;
-    margin-top: 4px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 10px;
+    margin-top: 6px;
+    width: 100%;
   }
   .weather-meta-item {
     font-size: 9px;
@@ -264,6 +200,12 @@
     font-family: 'Courier New', monospace;
     text-align: center;
     letter-spacing: 0.04em;
+    background: #222222;
+    border-radius: 8px;
+    padding: 5px 4px;
+  }
+  .weather-meta-item:last-child {
+    grid-column: 1 / -1;
   }
   .weather-meta-item span {
     display: block;
@@ -271,6 +213,7 @@
     font-size: 10px;
     margin-top: 2px;
   }
+
   .weather-loading {
     font-size: 10px;
     color: #666;
@@ -290,9 +233,37 @@
     gap: 10px;
     align-items: center;
     justify-content: center;
-    margin-top: 6px;
     flex-wrap: wrap;
+    /* positioned at the bottom of the rotated viewport */
+    position: fixed;
+    bottom: 16px;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    transition: transform 0.4s ease;
+    transform-origin: center center;
   }
+
+  /* Counter-rotate just the button so text is always readable, bar stays at visual bottom */
+  body.rot-90  .settings-bar {
+    bottom: auto; top: 0; right: auto; left: 0;
+    width: auto; height: 100vh;
+    flex-direction: column;
+    padding: 0 0 0 16px;
+  }
+  body.rot-90  .settings-bar .settings-btn { transform: rotate(90deg); }
+
+  body.rot-180 .settings-bar { bottom: auto; top: 16px; }
+  body.rot-180 .settings-bar .settings-btn { transform: rotate(180deg); }
+
+  body.rot-270 .settings-bar {
+    bottom: auto; top: 0; left: auto; right: 0;
+    width: auto; height: 100vh;
+    flex-direction: column;
+    padding: 0 16px 0 0;
+  }
+  body.rot-270 .settings-bar .settings-btn { transform: rotate(-90deg); }
+
 
   .settings-btn {
     background: #1a1a1a;
@@ -401,11 +372,19 @@
     <!-- CLOCK -->
     <div class="card clock-card">
       <div class="clock-face" id="clockFace">
-        <!-- ticks injected by JS -->
-        <div class="hand hour-hand"   id="hourHand"></div>
-        <div class="hand minute-hand" id="minuteHand"></div>
-        <div class="hand second-hand" id="secondHand"></div>
-        <div class="center-dot"><div class="center-dot-inner"></div></div>
+        <svg id="clockSvg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <!-- Face -->
+          <circle cx="50" cy="50" r="48" fill="#ffffff" stroke="#e0e0e0" stroke-width="2"/>
+          <!-- Tick marks injected by JS -->
+          <g id="tickGroup"></g>
+          <!-- Hands -->
+          <line id="hourHand"   x1="50" y1="50" x2="50" y2="24" stroke="#1a1a1a" stroke-width="4"   stroke-linecap="round"/>
+          <line id="minuteHand" x1="50" y1="50" x2="50" y2="17" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+          <line id="secondHand" x1="50" y1="50" x2="50" y2="14" stroke="#c8860a" stroke-width="1.5" stroke-linecap="round"/>
+          <!-- Center dot -->
+          <circle cx="50" cy="50" r="4"   fill="#c8860a"/>
+          <circle cx="50" cy="50" r="1.8" fill="#1a1a1a"/>
+        </svg>
       </div>
       <div class="time-label" id="timeLabel">--:-- --</div>
     </div>
@@ -423,12 +402,11 @@
   </div>
 </div>
 
-<!-- Settings bar (outside rotation so it stays accessible) -->
-<div style="position:fixed;bottom:16px;left:0;right:0;display:flex;justify-content:center;z-index:50;">
-  <div class="settings-bar">
-    <button class="settings-btn" onclick="openSettings()">⚙ Settings</button>
-  </div>
-  </div>
+<!-- Settings bar - fixed, counter-rotates with page -->
+<div class="settings-bar">
+  <button class="settings-btn" onclick="openSettings()">⚙ Settings</button>
+</div>
+
 <!-- Settings Panel -->
 <div class="settings-panel" id="settingsPanel">
   <div class="settings-box">
@@ -512,6 +490,8 @@ function applyRotation() {
   const w = document.getElementById('rotation-wrapper');
   w.className = '';
   if (prefs.rotation !== '0') w.classList.add('rotate-' + prefs.rotation);
+  // Update body class so settings bar counter-rotates correctly
+  document.body.className = prefs.rotation !== '0' ? 'rot-' + prefs.rotation : '';
 }
 
 function cycleRotation() {
@@ -523,54 +503,57 @@ function cycleRotation() {
 
 // ─── CLOCK ───────────────────────────────────────────────────────────────────
 (function buildTicks() {
-  const face = document.getElementById('clockFace');
-  const r = 50; // radius % from center
-  for (let i = 0; i < 60; i++) {
-    const angle = (i / 60) * 360;
-    const isMajor = i % 5 === 0;
-    const len = isMajor ? 8 : 5;
-    const tick = document.createElement('div');
-    tick.className = 'tick' + (isMajor ? ' major' : '');
-    const rad = (angle - 90) * Math.PI / 180;
-    // position from center outward
-    const cx = 50 + r * Math.cos(rad);
-    const cy = 50 + r * Math.sin(rad);
-    tick.style.cssText = `
-      position:absolute;
-      left:${cx}%;
-      top:${cy}%;
-      height:${len}%;
-      transform:translate(-50%,-100%) rotate(${angle}deg);
-      transform-origin: 50% 100%;
-    `;
-    face.appendChild(tick);
+  var g = document.getElementById('tickGroup');
+  for (var i = 0; i < 60; i++) {
+    var angle = (i / 60) * 360;
+    var isMajor = (i % 5 === 0);
+    var rad = (angle - 90) * Math.PI / 180;
+    var r1 = isMajor ? 40 : 43;
+    var r2 = 47;
+    var x1 = 50 + r1 * Math.cos(rad);
+    var y1 = 50 + r1 * Math.sin(rad);
+    var x2 = 50 + r2 * Math.cos(rad);
+    var y2 = 50 + r2 * Math.sin(rad);
+    var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', x1);
+    line.setAttribute('y1', y1);
+    line.setAttribute('x2', x2);
+    line.setAttribute('y2', y2);
+    line.setAttribute('stroke', isMajor ? '#555555' : '#aaaaaa');
+    line.setAttribute('stroke-width', isMajor ? '2' : '1');
+    line.setAttribute('stroke-linecap', 'round');
+    g.appendChild(line);
   }
 })();
 
+function rotateHand(el, deg) {
+  el.setAttribute('transform', 'rotate(' + deg + ' 50 50)');
+}
+
 function updateClock() {
-  const now    = new Date();
-  const s      = now.getSeconds();
-  const m      = now.getMinutes();
-  const h      = now.getHours() % 12;
+  var now = new Date();
+  var s   = now.getSeconds();
+  var m   = now.getMinutes();
+  var h   = now.getHours() % 12;
 
-  const sDeg = s * 6;
-  const mDeg = m * 6 + s * 0.1;
-  const hDeg = h * 30 + m * 0.5;
+  var sDeg = s * 6;
+  var mDeg = m * 6 + s * 0.1;
+  var hDeg = h * 30 + m * 0.5;
 
-  document.getElementById('secondHand').style.transform = `translateX(-50%) rotate(${sDeg}deg)`;
-  document.getElementById('minuteHand').style.transform = `translateX(-50%) rotate(${mDeg}deg)`;
-  document.getElementById('hourHand').style.transform   = `translateX(-50%) rotate(${hDeg}deg)`;
+  rotateHand(document.getElementById('secondHand'), sDeg);
+  rotateHand(document.getElementById('minuteHand'), mDeg);
+  rotateHand(document.getElementById('hourHand'),   hDeg);
 
-  // Digital label
-  let hr = now.getHours(), ampm = 'AM';
+  var hr = now.getHours(), ampm = 'AM';
   if (hr >= 12) { ampm = 'PM'; if (hr > 12) hr -= 12; }
   if (hr === 0) hr = 12;
-  const mm = String(m).padStart(2,'0');
-  document.getElementById('timeLabel').textContent = `${hr}:${mm} ${ampm}`;
+  var mm = String(m).padStart(2, '0');
+  document.getElementById('timeLabel').textContent = hr + ':' + mm + ' ' + ampm;
 }
 
 setInterval(updateClock, 1000);
 updateClock();
+
 
 // ─── CALENDAR ────────────────────────────────────────────────────────────────
 function buildCalendar() {
