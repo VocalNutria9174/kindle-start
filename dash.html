@@ -2,54 +2,76 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Kindle Dashboard</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  * { margin: 0; padding: 0; -webkit-box-sizing: border-box; box-sizing: border-box; }
 
   body {
     background: #ffffff;
     font-family: Georgia, 'Times New Roman', serif;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    min-height: 100%;
     overflow: hidden;
   }
 
   /* Rotation wrapper */
   #rotation-wrapper {
+    width: 100%;
+    height: 100%;
+    display: -webkit-box;
+    display: -webkit-flex;
     display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
     align-items: center;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
     justify-content: center;
-    width: 100vw;
-    height: 100vh;
-    transition: transform 0.4s ease;
   }
 
-  #rotation-wrapper.rotate-90  { transform: rotate(90deg);  width: 100vh; height: 100vw; }
-  #rotation-wrapper.rotate-180 { transform: rotate(180deg); }
-  #rotation-wrapper.rotate-270 { transform: rotate(270deg); width: 100vh; height: 100vw; }
+  #rotation-wrapper.rotate-90  { -webkit-transform: rotate(90deg);  transform: rotate(90deg); }
+  #rotation-wrapper.rotate-180 { -webkit-transform: rotate(180deg); transform: rotate(180deg); }
+  #rotation-wrapper.rotate-270 { -webkit-transform: rotate(270deg); transform: rotate(270deg); }
 
-  /* Grid layout */
+  /* Grid layout — use table-based fallback friendly display */
   .dashboard {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 18px;
-    padding: 24px 24px 80px 24px;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+    gap: 14px;
+    padding: 16px 16px 70px 16px;
     max-width: 760px;
+    width: 100%;
+  }
+
+  /* Top row: 3 equal cards */
+  .top-row {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+    gap: 14px;
     width: 100%;
   }
 
   /* Card base */
   .card {
     background: #1a1a1a;
-    border-radius: 22px;
-    padding: 22px;
+    border-radius: 18px;
+    padding: 16px;
+    display: -webkit-box;
+    display: -webkit-flex;
     display: flex;
+    -webkit-flex-direction: column;
     flex-direction: column;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
     align-items: center;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
     justify-content: center;
     color: #ffffff;
     position: relative;
@@ -57,23 +79,29 @@
   }
 
   /* ============ CLOCK ============ */
-  .clock-card { grid-column: 1; grid-row: 1; aspect-ratio: 1; }
+  .clock-card {
+    -webkit-box-flex: 1;
+    -webkit-flex: 1 1 0;
+    flex: 1 1 0;
+    /* fixed height instead of aspect-ratio (not supported on Kindle WebKit) */
+    height: 170px;
+  }
 
   .clock-face {
-    width: 90%;
-    aspect-ratio: 1;
+    width: 120px;
+    height: 120px;
     position: relative;
   }
 
   .clock-face svg {
-    width: 100%;
-    height: 100%;
+    width: 120px;
+    height: 120px;
     display: block;
   }
 
   .time-label {
-    margin-top: 17px;
-    font-size: 13px;
+    margin-top: 10px;
+    font-size: 12px;
     letter-spacing: 0.12em;
     color: #aaaaaa;
     font-family: 'Courier New', monospace;
@@ -81,62 +109,70 @@
 
   /* ============ CALENDAR ============ */
   .calendar-card {
-    grid-column: 2;
-    grid-row: 1;
-    aspect-ratio: 1;
-    padding: 14px 15px;
+    -webkit-box-flex: 1;
+    -webkit-flex: 1 1 0;
+    flex: 1 1 0;
+    height: 170px;
+    padding: 12px 10px;
+    -webkit-box-align: start;
+    -webkit-align-items: flex-start;
     align-items: flex-start;
+    -webkit-box-pack: start;
+    -webkit-justify-content: flex-start;
     justify-content: flex-start;
   }
 
   .cal-header {
+    display: -webkit-box;
+    display: -webkit-flex;
     display: flex;
+    -webkit-box-align: baseline;
+    -webkit-align-items: baseline;
     align-items: baseline;
-    gap: 8px;
-    margin-bottom: 10px;
+    gap: 6px;
+    margin-bottom: 8px;
     width: 100%;
   }
   .cal-month {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: bold;
     color: #e05555;
-    letter-spacing: 0.10em;
+    letter-spacing: 0.08em;
     font-family: Helvetica, Arial, sans-serif;
   }
   .cal-year {
-    font-size: 14px;
+    font-size: 12px;
     color: #888888;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.04em;
     font-family: Helvetica, Arial, sans-serif;
     font-weight: 300;
   }
 
   .cal-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 2px;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
     width: 100%;
   }
   .cal-day-name {
+    width: 14.28%;
     text-align: center;
-    font-size: 9px;
+    font-size: 8px;
     color: #777777;
     font-family: Helvetica, Arial, sans-serif;
-    letter-spacing: 0.08em;
-    padding: 2px 0;
+    letter-spacing: 0.06em;
+    padding: 1px 0;
     font-weight: 600;
   }
   .cal-day {
+    width: 14.28%;
     text-align: center;
-    font-size: 11px;
+    font-size: 10px;
     color: #cccccc;
     font-family: Helvetica, Arial, sans-serif;
-    padding: 3px 1px;
-    border-radius: 50%;
-    aspect-ratio: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    padding: 2px 0;
     font-weight: 400;
   }
   .cal-day.today {
@@ -150,120 +186,142 @@
 
   /* ============ WEATHER ============ */
   .weather-card {
-    grid-column: 3;
-    grid-row: 1;
-    aspect-ratio: 1;
-    gap: 6px;
-    padding: 16px;
+    -webkit-box-flex: 1;
+    -webkit-flex: 1 1 0;
+    flex: 1 1 0;
+    height: 170px;
+    gap: 4px;
+    padding: 12px 10px;
   }
 
   .weather-city {
-    font-size: 11px;
+    font-size: 10px;
     color: #888888;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     font-family: 'Courier New', monospace;
     text-align: center;
   }
+  /* ASCII-art weather icon — works on all renderers */
   .weather-icon {
-    font-size: 36px;
+    font-size: 22px;
     line-height: 1;
-    margin: 4px 0;
+    margin: 3px 0;
+    font-family: 'Courier New', monospace;
+    color: #ffffff;
+    text-align: center;
+    letter-spacing: -0.05em;
   }
   .weather-temp {
-    font-size: 30px;
+    font-size: 26px;
     font-weight: bold;
     color: #ffffff;
     font-family: Georgia, serif;
     letter-spacing: -0.02em;
   }
   .weather-desc {
-    font-size: 10px;
+    font-size: 9px;
     color: #aaaaaa;
     text-align: center;
     font-family: 'Courier New', monospace;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
   }
   .weather-meta {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6px 10px;
-    margin-top: 6px;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 4px;
     width: 100%;
   }
   .weather-meta-item {
-    font-size: 9px;
+    -webkit-box-flex: 1;
+    -webkit-flex: 1 1 40%;
+    flex: 1 1 40%;
+    font-size: 8px;
     color: #dbdbdb;
     font-family: 'Courier New', monospace;
     text-align: center;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.03em;
     background: #222222;
-    border-radius: 8px;
-    padding: 5px 4px;
+    border-radius: 6px;
+    padding: 4px 3px;
   }
-  .weather-meta-item:last-child {
-    grid-column: 1 / -1;
+  .weather-meta-item.full {
+    -webkit-box-flex: 1;
+    -webkit-flex: 1 1 100%;
+    flex: 1 1 100%;
   }
   .weather-meta-item span {
     display: block;
     color: #cccccc;
-    font-size: 10px;
-    margin-top: 2px;
+    font-size: 9px;
+    margin-top: 1px;
   }
-
-  .weather-loading {
+  .weather-loading, .weather-error {
     font-size: 10px;
     color: #666;
     font-family: 'Courier New', monospace;
     text-align: center;
   }
-  .weather-error {
-    font-size: 10px;
-    color: #cc5555;
-    font-family: 'Courier New', monospace;
-    text-align: center;
-  }
+  .weather-error { color: #cc5555; }
 
   /* ============ NEWS PANEL ============ */
   .news-card {
-    grid-column: 1 / -1;
-    grid-row: 2;
-    border-radius: 22px;
+    width: 100%;
+    border-radius: 18px;
     background: #1a1a1a;
-    padding: 16px 20px;
+    padding: 14px 16px;
+    display: -webkit-box;
+    display: -webkit-flex;
     display: flex;
+    -webkit-flex-direction: column;
     flex-direction: column;
-    gap: 10px;
-    min-height: 130px;
+    gap: 8px;
+    min-height: 120px;
     position: relative;
     overflow: hidden;
   }
 
   .news-header {
+    display: -webkit-box;
+    display: -webkit-flex;
     display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
     align-items: center;
+    -webkit-box-pack: justify;
+    -webkit-justify-content: space-between;
     justify-content: space-between;
     width: 100%;
   }
 
   .news-category-tabs {
+    display: -webkit-box;
+    display: -webkit-flex;
     display: flex;
-    gap: 6px;
+    gap: 4px;
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
   }
 
   .news-tab {
     font-family: 'Courier New', monospace;
-    font-size: 9px;
-    letter-spacing: 0.1em;
+    font-size: 8px;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    padding: 3px 8px;
-    border-radius: 8px;
+    padding: 3px 7px;
+    border-radius: 6px;
     color: #555;
     cursor: pointer;
-    transition: background 0.2s, color 0.2s;
     border: none;
     background: transparent;
+    -webkit-appearance: none;
+    appearance: none;
+    -webkit-tap-highlight-color: transparent;
   }
   .news-tab.active {
     background: #e05555;
@@ -278,29 +336,33 @@
   }
 
   .news-items {
+    display: -webkit-box;
+    display: -webkit-flex;
     display: flex;
+    -webkit-flex-direction: column;
     flex-direction: column;
     gap: 6px;
+    -webkit-box-flex: 1;
+    -webkit-flex: 1;
     flex: 1;
   }
 
+  /* No opacity/transform animation — Kindle e-ink renders transitions poorly */
   .news-item {
+    display: -webkit-box;
+    display: -webkit-flex;
     display: flex;
+    -webkit-box-align: start;
+    -webkit-align-items: flex-start;
     align-items: flex-start;
-    gap: 8px;
-    opacity: 0;
-    transform: translateY(4px);
-    transition: opacity 0.4s ease, transform 0.4s ease;
-  }
-  .news-item.visible {
-    opacity: 1;
-    transform: translateY(0);
+    gap: 6px;
   }
 
   .news-bullet {
     font-size: 8px;
     color: #e05555;
-    margin-top: 4px;
+    margin-top: 3px;
+    -webkit-flex-shrink: 0;
     flex-shrink: 0;
   }
 
@@ -308,15 +370,14 @@
     font-family: 'Courier New', monospace;
     font-size: 10px;
     color: #cccccc;
-    line-height: 1.5;
-    letter-spacing: 0.03em;
+    line-height: 1.4;
+    letter-spacing: 0.02em;
   }
 
   .news-source {
     font-size: 9px;
     color: #555;
-    font-style: normal;
-    margin-left: 4px;
+    margin-left: 3px;
   }
 
   .news-status {
@@ -324,8 +385,8 @@
     font-size: 10px;
     color: #555;
     text-align: center;
-    padding: 10px 0;
-    letter-spacing: 0.06em;
+    padding: 8px 0;
+    letter-spacing: 0.05em;
   }
 
   .news-progress {
@@ -335,329 +396,356 @@
     height: 2px;
     background: #e05555;
     width: 0%;
-    transition: width linear;
-    border-radius: 0 0 0 22px;
+    border-radius: 0 0 0 18px;
   }
 
-  /* ============ SETTINGS ============ */
+  /* ============ SETTINGS BAR ============ */
+  /* position:fixed is broken on Kindle — use sticky in flow instead */
   .settings-bar {
+    width: 100%;
+    display: -webkit-box;
+    display: -webkit-flex;
     display: flex;
-    gap: 10px;
+    gap: 8px;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
     align-items: center;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
     justify-content: center;
-    flex-wrap: wrap;
-    position: fixed;
-    bottom: 16px;
-    left: 0;
-    right: 0;
-    z-index: 50;
-    transition: transform 0.4s ease;
-    transform-origin: center center;
+    padding: 8px 0 4px 0;
   }
-
-  body.rot-90  .settings-bar {
-    bottom: auto; top: 0; right: auto; left: 0;
-    width: auto; height: 100vh;
-    flex-direction: column;
-    padding: 0 0 0 16px;
-  }
-  body.rot-90  .settings-bar .settings-btn { transform: rotate(90deg); }
-
-  body.rot-180 .settings-bar { bottom: auto; top: 16px; }
-  body.rot-180 .settings-bar .settings-btn { transform: rotate(180deg); }
-
-  body.rot-270 .settings-bar {
-    bottom: auto; top: 0; left: auto; right: 0;
-    width: auto; height: 100vh;
-    flex-direction: column;
-    padding: 0 16px 0 0;
-  }
-  body.rot-270 .settings-bar .settings-btn { transform: rotate(-90deg); }
 
   .settings-btn {
     background: #1a1a1a;
     border: none;
-    border-radius: 12px;
+    border-radius: 10px;
     color: #aaaaaa;
     font-family: 'Courier New', monospace;
     font-size: 11px;
     padding: 8px 14px;
     cursor: pointer;
-    letter-spacing: 0.06em;
-    transition: background 0.2s, color 0.2s;
+    letter-spacing: 0.05em;
+    -webkit-appearance: none;
+    appearance: none;
     -webkit-tap-highlight-color: transparent;
-  }
-  .settings-btn:active, .settings-btn.active {
-    background: #333333;
-    color: #ffffff;
   }
 
   /* Settings panel */
   .settings-panel {
     display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.7);
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.85);
     z-index: 100;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
     align-items: center;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
     justify-content: center;
   }
-  .settings-panel.open { display: flex; }
+  .settings-panel.open { display: -webkit-box; display: -webkit-flex; display: flex; }
 
   .settings-box {
     background: #1a1a1a;
-    border-radius: 20px;
-    padding: 28px 32px;
-    min-width: 280px;
+    border-radius: 16px;
+    padding: 22px 24px;
+    min-width: 260px;
+    max-width: 320px;
     color: #cccccc;
     font-family: 'Courier New', monospace;
+    display: -webkit-box;
+    display: -webkit-flex;
     display: flex;
+    -webkit-flex-direction: column;
     flex-direction: column;
-    gap: 16px;
-    max-height: 90vh;
+    gap: 14px;
+    max-height: 85%;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   .settings-box h2 {
-    font-size: 14px;
-    letter-spacing: 0.12em;
+    font-size: 13px;
+    letter-spacing: 0.1em;
     color: #ffffff;
     text-transform: uppercase;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
     font-family: Georgia, serif;
   }
   .settings-box label {
     font-size: 10px;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.07em;
     color: #777;
     text-transform: uppercase;
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
   }
   .settings-box input, .settings-box select {
     width: 100%;
     background: #2a2a2a;
     border: 1px solid #333;
-    border-radius: 8px;
+    border-radius: 7px;
     color: #cccccc;
     font-family: 'Courier New', monospace;
     font-size: 13px;
-    padding: 8px 12px;
+    padding: 7px 10px;
     outline: none;
-  }
-  .settings-box input:focus, .settings-box select:focus {
-    border-color: #555;
+    -webkit-appearance: none;
+    appearance: none;
   }
   .settings-save {
     background: #e05555;
     border: none;
-    border-radius: 10px;
+    border-radius: 8px;
     color: #fff;
     font-family: 'Courier New', monospace;
     font-size: 12px;
-    letter-spacing: 0.1em;
-    padding: 10px;
+    letter-spacing: 0.08em;
+    padding: 9px;
     cursor: pointer;
     text-transform: uppercase;
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
   }
   .settings-close {
     background: #2a2a2a;
     border: none;
-    border-radius: 10px;
+    border-radius: 8px;
     color: #aaa;
     font-family: 'Courier New', monospace;
     font-size: 12px;
-    letter-spacing: 0.08em;
-    padding: 10px;
+    letter-spacing: 0.06em;
+    padding: 9px;
     cursor: pointer;
     text-transform: uppercase;
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
   }
-  .settings-row { display: flex; gap: 8px; }
-  .settings-row > * { flex: 1; }
+  .settings-row {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    gap: 8px;
+  }
+  .settings-row > * { -webkit-box-flex: 1; -webkit-flex: 1; flex: 1; }
+
 </style>
 </head>
 <body>
 
-<div id="rotation-wrapper">
-  <div class="dashboard">
+<!-- Wrap everything in a scrollable container so position:fixed isn't needed -->
+<div id="page-wrap" style="display:-webkit-flex;display:flex;-webkit-flex-direction:column;flex-direction:column;min-height:100vh;-webkit-box-align:center;-webkit-align-items:center;align-items:center;-webkit-box-pack:center;-webkit-justify-content:center;justify-content:center;">
 
-    <!-- CLOCK -->
-    <div class="card clock-card">
-      <div class="clock-face" id="clockFace">
-        <svg id="clockSvg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="50" cy="50" r="48" fill="#ffffff" stroke="#e0e0e0" stroke-width="2"/>
-          <g id="tickGroup"></g>
-          <line id="hourHand"   x1="50" y1="50" x2="50" y2="24" stroke="#1a1a1a" stroke-width="4"   stroke-linecap="round"/>
-          <line id="minuteHand" x1="50" y1="50" x2="50" y2="17" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
-          <line id="secondHand" x1="50" y1="50" x2="50" y2="14" stroke="#c8860a" stroke-width="1.5" stroke-linecap="round"/>
-          <circle cx="50" cy="50" r="4"   fill="#c8860a"/>
-          <circle cx="50" cy="50" r="1.8" fill="#1a1a1a"/>
-        </svg>
-      </div>
-      <div class="time-label" id="timeLabel">--:-- --</div>
-    </div>
+  <div id="rotation-wrapper">
+    <div class="dashboard">
 
-    <!-- CALENDAR -->
-    <div class="card calendar-card" id="calendarCard"></div>
+      <div class="top-row">
 
-    <!-- WEATHER -->
-    <div class="card weather-card" id="weatherCard">
-      <div class="weather-loading">Loading weather…</div>
-    </div>
-
-    <!-- NEWS PANEL -->
-    <div class="news-card" id="newsCard">
-      <div class="news-header">
-        <div class="news-category-tabs" id="newsTabs">
-          <button class="news-tab active" data-cat="tech">TECH</button>
-          <button class="news-tab" data-cat="science">SCIENCE</button>
-          <button class="news-tab" data-cat="business">BUSINESS</button>
-          <button class="news-tab" data-cat="sports">SPORTS</button>
+        <!-- CLOCK -->
+        <div class="card clock-card">
+          <div class="clock-face" id="clockFace">
+            <svg id="clockSvg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="50" cy="50" r="48" fill="#ffffff" stroke="#e0e0e0" stroke-width="2"/>
+              <g id="tickGroup"></g>
+              <line id="hourHand"   x1="50" y1="50" x2="50" y2="24" stroke="#1a1a1a" stroke-width="4"   stroke-linecap="round"/>
+              <line id="minuteHand" x1="50" y1="50" x2="50" y2="17" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+              <line id="secondHand" x1="50" y1="50" x2="50" y2="14" stroke="#c8860a" stroke-width="1.5" stroke-linecap="round"/>
+              <circle cx="50" cy="50" r="4"   fill="#c8860a"/>
+              <circle cx="50" cy="50" r="1.8" fill="#1a1a1a"/>
+            </svg>
+          </div>
+          <div class="time-label" id="timeLabel">--:-- --</div>
         </div>
-        <div class="news-countdown" id="newsCountdown"></div>
+
+        <!-- CALENDAR -->
+        <div class="card calendar-card" id="calendarCard"></div>
+
+        <!-- WEATHER -->
+        <div class="card weather-card" id="weatherCard">
+          <div class="weather-loading">Loading weather...</div>
+        </div>
+
+      </div><!-- /top-row -->
+
+      <!-- NEWS PANEL -->
+      <div class="news-card" id="newsCard">
+        <div class="news-header">
+          <div class="news-category-tabs" id="newsTabs">
+            <button class="news-tab active" data-cat="tech">TECH</button>
+            <button class="news-tab" data-cat="science">SCI</button>
+            <button class="news-tab" data-cat="business">BIZ</button>
+            <button class="news-tab" data-cat="sports">SPORT</button>
+          </div>
+          <div class="news-countdown" id="newsCountdown"></div>
+        </div>
+        <div class="news-items" id="newsItems">
+          <div class="news-status">Loading headlines...</div>
+        </div>
+        <div class="news-progress" id="newsProgress"></div>
       </div>
-      <div class="news-items" id="newsItems">
-        <div class="news-status">Loading headlines…</div>
+
+      <!-- Settings bar (in-flow, not fixed) -->
+      <div class="settings-bar">
+        <button class="settings-btn" id="settingsOpenBtn">Settings</button>
       </div>
-      <div class="news-progress" id="newsProgress"></div>
-    </div>
 
-  </div>
-</div>
+    </div><!-- /dashboard -->
+  </div><!-- /rotation-wrapper -->
 
-<!-- Settings bar -->
-<div class="settings-bar">
-  <button class="settings-btn" onclick="openSettings()">⚙ Settings</button>
-</div>
+  <!-- Settings Panel — absolute inside page-wrap -->
+  <div class="settings-panel" id="settingsPanel">
+    <div class="settings-box">
+      <h2>Dashboard Settings</h2>
 
-<!-- Settings Panel -->
-<div class="settings-panel" id="settingsPanel">
-  <div class="settings-box">
-    <h2>Dashboard Settings</h2>
+      <div>
+        <label>City Name</label>
+        <input type="text" id="settingCity" placeholder="e.g. Atlanta" />
+      </div>
 
-    <div>
-      <label>City Name</label>
-      <input type="text" id="settingCity" placeholder="e.g. Atlanta" />
-    </div>
+      <div>
+        <label>Temperature Unit</label>
+        <select id="settingUnit">
+          <option value="imperial">Fahrenheit (F)</option>
+          <option value="metric">Celsius (C)</option>
+        </select>
+      </div>
 
-    <div>
-      <label>Temperature Unit</label>
-      <select id="settingUnit">
-        <option value="imperial">Fahrenheit (°F)</option>
-        <option value="metric">Celsius (°C)</option>
-      </select>
-    </div>
+      <div>
+        <label>Timezone (UTC offset)</label>
+        <select id="settingTimezone">
+          <option value="-12">UTC-12 (Baker Island)</option>
+          <option value="-11">UTC-11 (American Samoa)</option>
+          <option value="-10">UTC-10 (Hawaii)</option>
+          <option value="-9">UTC-9 (Alaska)</option>
+          <option value="-8">UTC-8 (Pacific Time)</option>
+          <option value="-7">UTC-7 (Mountain Time)</option>
+          <option value="-6">UTC-6 (Central Time)</option>
+          <option value="-5">UTC-5 (Eastern Time)</option>
+          <option value="-4">UTC-4 (Atlantic / EDT)</option>
+          <option value="-3">UTC-3 (Buenos Aires)</option>
+          <option value="-2">UTC-2 (Mid-Atlantic)</option>
+          <option value="-1">UTC-1 (Azores)</option>
+          <option value="0">UTC+0 (London / GMT)</option>
+          <option value="1">UTC+1 (Paris / Berlin)</option>
+          <option value="2">UTC+2 (Athens / Cairo)</option>
+          <option value="3">UTC+3 (Moscow / Riyadh)</option>
+          <option value="3.5">UTC+3:30 (Tehran)</option>
+          <option value="4">UTC+4 (Dubai / Baku)</option>
+          <option value="4.5">UTC+4:30 (Kabul)</option>
+          <option value="5">UTC+5 (Karachi)</option>
+          <option value="5.5">UTC+5:30 (India / IST)</option>
+          <option value="5.75">UTC+5:45 (Nepal)</option>
+          <option value="6">UTC+6 (Dhaka)</option>
+          <option value="6.5">UTC+6:30 (Yangon)</option>
+          <option value="7">UTC+7 (Bangkok)</option>
+          <option value="8">UTC+8 (China / Singapore)</option>
+          <option value="9">UTC+9 (Tokyo / Seoul)</option>
+          <option value="9.5">UTC+9:30 (Adelaide)</option>
+          <option value="10">UTC+10 (Sydney)</option>
+          <option value="11">UTC+11 (Solomon Islands)</option>
+          <option value="12">UTC+12 (Auckland / Fiji)</option>
+        </select>
+      </div>
 
-    <div>
-      <label>Timezone (UTC offset)</label>
-      <select id="settingTimezone">
-        <option value="-12">UTC-12 (Baker Island)</option>
-        <option value="-11">UTC-11 (American Samoa)</option>
-        <option value="-10">UTC-10 (Hawaii)</option>
-        <option value="-9">UTC-9 (Alaska)</option>
-        <option value="-8">UTC-8 (Pacific Time)</option>
-        <option value="-7">UTC-7 (Mountain Time)</option>
-        <option value="-6">UTC-6 (Central Time)</option>
-        <option value="-5">UTC-5 (Eastern Time)</option>
-        <option value="-4">UTC-4 (Atlantic Time / EDT)</option>
-        <option value="-3">UTC-3 (Buenos Aires)</option>
-        <option value="-2">UTC-2 (Mid-Atlantic)</option>
-        <option value="-1">UTC-1 (Azores)</option>
-        <option value="0">UTC+0 (London / GMT)</option>
-        <option value="1">UTC+1 (Paris / Berlin / CET)</option>
-        <option value="2">UTC+2 (Athens / Cairo / EET)</option>
-        <option value="3">UTC+3 (Moscow / Riyadh)</option>
-        <option value="3.5">UTC+3:30 (Tehran)</option>
-        <option value="4">UTC+4 (Dubai / Baku)</option>
-        <option value="4.5">UTC+4:30 (Kabul)</option>
-        <option value="5">UTC+5 (Karachi / Tashkent)</option>
-        <option value="5.5">UTC+5:30 (India / IST)</option>
-        <option value="5.75">UTC+5:45 (Nepal)</option>
-        <option value="6">UTC+6 (Dhaka / Almaty)</option>
-        <option value="6.5">UTC+6:30 (Yangon)</option>
-        <option value="7">UTC+7 (Bangkok / Jakarta)</option>
-        <option value="8">UTC+8 (China / Singapore / HKT)</option>
-        <option value="9">UTC+9 (Tokyo / Seoul / JST)</option>
-        <option value="9.5">UTC+9:30 (Adelaide / Darwin)</option>
-        <option value="10">UTC+10 (Sydney / AEST)</option>
-        <option value="11">UTC+11 (Solomon Islands)</option>
-        <option value="12">UTC+12 (Auckland / Fiji)</option>
-      </select>
-    </div>
+      <div>
+        <label>Page Rotation</label>
+        <select id="settingRotation">
+          <option value="0">Normal (0 deg)</option>
+          <option value="90">90 deg Clockwise</option>
+          <option value="180">Upside Down (180 deg)</option>
+          <option value="270">90 deg Counter-Clockwise</option>
+        </select>
+      </div>
 
-    <div>
-      <label>Page Rotation</label>
-      <select id="settingRotation">
-        <option value="0">Normal (0°)</option>
-        <option value="90">90° Clockwise</option>
-        <option value="180">Upside Down (180°)</option>
-        <option value="270">90° Counter-Clockwise</option>
-      </select>
-    </div>
-
-    <br>
-    <div class="settings-row">
-      <button class="settings-save" onclick="saveSettings()">Save</button>
-      <button class="settings-close" onclick="closeSettings()">Cancel</button>
+      <br>
+      <div class="settings-row">
+        <button class="settings-save" id="settingsSaveBtn">Save</button>
+        <button class="settings-close" id="settingsCloseBtn">Cancel</button>
+      </div>
     </div>
   </div>
-</div>
+
+</div><!-- /page-wrap -->
 
 <script>
+// ─── COMPAT HELPERS ──────────────────────────────────────────────────────────
+// Avoid arrow functions and const/let where Kindle WebKit may choke.
+// Use var everywhere, classic function declarations, no template literals.
+
+// Safe localStorage wrapper (may be blocked on Kindle)
+var storage = (function() {
+  try {
+    localStorage.setItem('__test__', '1');
+    localStorage.removeItem('__test__');
+    return localStorage;
+  } catch(e) {
+    // Fallback: in-memory store
+    var mem = {};
+    return {
+      getItem: function(k) { return mem[k] !== undefined ? mem[k] : null; },
+      setItem: function(k, v) { mem[k] = String(v); },
+      removeItem: function(k) { delete mem[k]; }
+    };
+  }
+})();
+
 // ─── STORAGE ─────────────────────────────────────────────────────────────────
-const STORAGE_KEY = 'kindle_dashboard_v2';
+var STORAGE_KEY = 'kindle_dashboard_v2';
 
 function loadPrefs() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
-  catch { return {}; }
+  try {
+    var raw = storage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch(e) { return {}; }
 }
 function savePrefs(obj) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+  try { storage.setItem(STORAGE_KEY, JSON.stringify(obj)); } catch(e) {}
 }
 
-let prefs = loadPrefs();
-if (!prefs.city)       prefs.city       = 'Atlanta';
-if (!prefs.unit)       prefs.unit       = 'imperial';
-if (!prefs.rotation)   prefs.rotation   = '0';
-if (prefs.tzOffset === undefined) prefs.tzOffset = -5; // default Eastern
+var prefs = loadPrefs();
+if (!prefs.city)              prefs.city     = 'Atlanta';
+if (!prefs.unit)              prefs.unit     = 'imperial';
+if (!prefs.rotation)          prefs.rotation = '0';
+if (prefs.tzOffset === undefined) prefs.tzOffset = -5;
 
 // ─── SETTINGS UI ─────────────────────────────────────────────────────────────
 function openSettings() {
-  document.getElementById('settingCity').value       = prefs.city;
-  document.getElementById('settingUnit').value       = prefs.unit;
-  document.getElementById('settingRotation').value   = prefs.rotation;
-  document.getElementById('settingTimezone').value   = String(prefs.tzOffset);
-  document.getElementById('settingsPanel').classList.add('open');
+  document.getElementById('settingCity').value     = prefs.city;
+  document.getElementById('settingUnit').value     = prefs.unit;
+  document.getElementById('settingRotation').value = prefs.rotation;
+  document.getElementById('settingTimezone').value = String(prefs.tzOffset);
+  document.getElementById('settingsPanel').className = 'settings-panel open';
 }
 function closeSettings() {
-  document.getElementById('settingsPanel').classList.remove('open');
+  document.getElementById('settingsPanel').className = 'settings-panel';
 }
 function saveSettings() {
-  prefs.city       = document.getElementById('settingCity').value.trim() || 'Atlanta';
-  prefs.unit       = document.getElementById('settingUnit').value;
-  prefs.rotation   = document.getElementById('settingRotation').value;
-  prefs.tzOffset   = parseFloat(document.getElementById('settingTimezone').value);
+  prefs.city     = document.getElementById('settingCity').value || 'Atlanta';
+  prefs.unit     = document.getElementById('settingUnit').value;
+  prefs.rotation = document.getElementById('settingRotation').value;
+  prefs.tzOffset = parseFloat(document.getElementById('settingTimezone').value);
   savePrefs(prefs);
   closeSettings();
   applyRotation();
   fetchWeather();
 }
 
+document.getElementById('settingsOpenBtn').onclick  = openSettings;
+document.getElementById('settingsSaveBtn').onclick  = saveSettings;
+document.getElementById('settingsCloseBtn').onclick = closeSettings;
+
 // ─── ROTATION ────────────────────────────────────────────────────────────────
-const rotations = ['0','90','180','270'];
+var rotations = ['0','90','180','270'];
 function applyRotation() {
-  const w = document.getElementById('rotation-wrapper');
+  var w = document.getElementById('rotation-wrapper');
   w.className = '';
-  if (prefs.rotation !== '0') w.classList.add('rotate-' + prefs.rotation);
-  document.body.className = prefs.rotation !== '0' ? 'rot-' + prefs.rotation : '';
-}
-function cycleRotation() {
-  const idx = rotations.indexOf(prefs.rotation);
-  prefs.rotation = rotations[(idx + 1) % rotations.length];
-  savePrefs(prefs);
-  applyRotation();
+  if (prefs.rotation !== '0') w.className = 'rotate-' + prefs.rotation;
 }
 
-// ─── CLOCK (timezone-aware) ───────────────────────────────────────────────────
+// ─── CLOCK ───────────────────────────────────────────────────────────────────
 (function buildTicks() {
   var g = document.getElementById('tickGroup');
   for (var i = 0; i < 60; i++) {
@@ -685,7 +773,6 @@ function rotateHand(el, deg) {
 }
 
 function getAdjustedTime() {
-  // Get current UTC time, then apply user's chosen offset
   var now = new Date();
   var utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
   var tzMs  = prefs.tzOffset * 3600000;
@@ -702,10 +789,11 @@ function updateClock() {
   rotateHand(document.getElementById('minuteHand'), m * 6 + s * 0.1);
   rotateHand(document.getElementById('hourHand'),   h * 30 + m * 0.5);
 
-  var hr = now.getHours(), ampm = 'AM';
-  if (hr >= 12) { ampm = 'PM'; if (hr > 12) hr -= 12; }
+  var hr = now.getHours();
+  var ampm = hr >= 12 ? 'PM' : 'AM';
+  if (hr > 12) hr -= 12;
   if (hr === 0) hr = 12;
-  var mm = String(m).padStart(2, '0');
+  var mm = m < 10 ? '0' + m : String(m);
   document.getElementById('timeLabel').textContent = hr + ':' + mm + ' ' + ampm;
 }
 
@@ -714,272 +802,310 @@ updateClock();
 
 // ─── CALENDAR ────────────────────────────────────────────────────────────────
 function buildCalendar() {
-  const now   = getAdjustedTime();
-  const year  = now.getFullYear();
-  const month = now.getMonth();
-  const today = now.getDate();
-  const monthNames = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE',
-                      'JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
-  const dayNames = ['S','M','T','W','T','F','S'];
-  const firstDay  = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  var now   = getAdjustedTime();
+  var year  = now.getFullYear();
+  var month = now.getMonth();
+  var today = now.getDate();
+  var monthNames = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE',
+                    'JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+  var dayNames = ['S','M','T','W','T','F','S'];
+  var firstDay  = new Date(year, month, 1).getDay();
+  var daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  let html = `<div class="cal-header">
-    <span class="cal-month">${monthNames[month]}</span>
-    <span class="cal-year">${year}</span>
-  </div><div class="cal-grid">`;
+  var html = '<div class="cal-header"><span class="cal-month">'
+    + monthNames[month] + '</span><span class="cal-year">' + year + '</span></div>'
+    + '<div class="cal-grid">';
 
-  dayNames.forEach(d => html += `<div class="cal-day-name">${d}</div>`);
-  for (let i = 0; i < firstDay; i++) html += `<div class="cal-day empty"></div>`;
-  for (let d = 1; d <= daysInMonth; d++)
-    html += `<div class="cal-day${d === today ? ' today' : ''}">${d}</div>`;
-  const remainder = (firstDay + daysInMonth) % 7;
-  if (remainder > 0)
-    for (let i = 0; i < (7 - remainder); i++)
-      html += `<div class="cal-day other-month"></div>`;
+  for (var di = 0; di < dayNames.length; di++) {
+    html += '<div class="cal-day-name">' + dayNames[di] + '</div>';
+  }
+  for (var i = 0; i < firstDay; i++) {
+    html += '<div class="cal-day empty"></div>';
+  }
+  for (var d = 1; d <= daysInMonth; d++) {
+    html += '<div class="cal-day' + (d === today ? ' today' : '') + '">' + d + '</div>';
+  }
+  var remainder = (firstDay + daysInMonth) % 7;
+  if (remainder > 0) {
+    for (var j = 0; j < (7 - remainder); j++) {
+      html += '<div class="cal-day other-month"></div>';
+    }
+  }
   html += '</div>';
   document.getElementById('calendarCard').innerHTML = html;
 }
 buildCalendar();
 
 // ─── WEATHER ─────────────────────────────────────────────────────────────────
-const API_KEY = '0264a07ef00385ae3a6ea69858c85c52';
+var API_KEY = '0264a07ef00385ae3a6ea69858c85c52';
 
-const weatherIcons = {
-  'Clear':'☀️','Clouds':'☁️','Rain':'🌧️','Drizzle':'🌦️',
-  'Thunderstorm':'⛈️','Snow':'❄️','Mist':'🌫️','Fog':'🌫️',
-  'Haze':'🌫️','Smoke':'🌫️','Dust':'💨','Sand':'💨',
-  'Ash':'🌋','Squall':'💨','Tornado':'🌪️'
+// Text-based weather icons — emoji are unreliable on Kindle e-ink
+var weatherIcons = {
+  'Clear':        '[SUN]',
+  'Clouds':       '[CLD]',
+  'Rain':         '[RAN]',
+  'Drizzle':      '[DRZ]',
+  'Thunderstorm': '[STM]',
+  'Snow':         '[SNW]',
+  'Mist':         '[MST]',
+  'Fog':          '[FOG]',
+  'Haze':         '[HAZ]',
+  'Smoke':        '[SMK]',
+  'Dust':         '[DST]',
+  'Sand':         '[SND]',
+  'Ash':          '[ASH]',
+  'Squall':       '[SQU]',
+  'Tornado':      '[TRN]'
 };
 
 function fetchWeather() {
   var card = document.getElementById('weatherCard');
   var unit = prefs.unit;
-  var unitSymbol = unit === 'imperial' ? '°F' : '°C';
-  card.innerHTML = '<div class="weather-loading">Fetching weather…</div>';
+  var unitSymbol = unit === 'imperial' ? 'F' : 'C';
+  card.innerHTML = '<div class="weather-loading">Fetching weather...</div>';
+
   var url = 'https://api.openweathermap.org/data/2.5/weather?q='
-    + encodeURIComponent(prefs.city) + '&appid=' + API_KEY + '&units=' + unit;
+    + encodeURIComponent(prefs.city)
+    + '&appid=' + API_KEY
+    + '&units=' + unit;
+
   var xhr = new XMLHttpRequest();
-  xhr.open('GET', url, true); xhr.timeout = 15000;
+  xhr.open('GET', url, true);
+  xhr.timeout = 15000;
+
   xhr.onreadystatechange = function() {
     if (xhr.readyState !== 4) return;
     if (xhr.status === 200) {
       try {
         var data = JSON.parse(xhr.responseText);
-        var main = data.weather[0].main, desc = data.weather[0].description;
-        var temp = Math.round(data.main.temp), feelsLike = Math.round(data.main.feels_like);
+        var main = data.weather[0].main;
+        var desc = data.weather[0].description;
+        var temp = Math.round(data.main.temp);
+        var feelsLike = Math.round(data.main.feels_like);
         var humidity = data.main.humidity;
         var windSpeed = Math.round(data.wind.speed);
-        var wind = unit === 'imperial' ? windSpeed + ' mph' : windSpeed + ' m/s';
-        var icon = weatherIcons[main] || '🌡';
+        var wind = unit === 'imperial' ? (windSpeed + ' mph') : (windSpeed + ' m/s');
+        var icon = weatherIcons[main] || '[WX]';
         card.innerHTML =
           '<div class="weather-city">' + data.name.toUpperCase() + '</div>' +
           '<div class="weather-icon">' + icon + '</div>' +
-          '<div class="weather-temp">' + temp + unitSymbol + '</div>' +
+          '<div class="weather-temp">' + temp + '&deg;' + unitSymbol + '</div>' +
           '<div class="weather-desc">' + desc + '</div>' +
           '<div class="weather-meta">' +
-            '<div class="weather-meta-item">FEELS LIKE<span>' + feelsLike + unitSymbol + '</span></div>' +
-            '<div class="weather-meta-item">HUM<span>' + humidity + '%</span></div>' +
-            '<div class="weather-meta-item">WIND<span>' + wind + '</span></div>' +
+            '<div class="weather-meta-item">FEELS LIKE<span>' + feelsLike + '&deg;' + unitSymbol + '</span></div>' +
+            '<div class="weather-meta-item">HUMIDITY<span>' + humidity + '%</span></div>' +
+            '<div class="weather-meta-item full">WIND<span>' + wind + '</span></div>' +
           '</div>';
       } catch(e) {
-        card.innerHTML = '<div class="weather-error">⚠ Parse error</div>';
+        card.innerHTML = '<div class="weather-error">Parse error</div>';
       }
     } else if (xhr.status === 404) {
-      card.innerHTML = '<div class="weather-error">⚠ City not found<br><small style="color:#555">Check city name in settings</small></div>';
+      card.innerHTML = '<div class="weather-error">City not found</div>';
     } else if (xhr.status === 401) {
-      card.innerHTML = '<div class="weather-error">⚠ Invalid API key</div>';
+      card.innerHTML = '<div class="weather-error">Invalid API key</div>';
     } else {
-      card.innerHTML = '<div class="weather-error">⚠ Error ' + xhr.status + '</div>';
+      card.innerHTML = '<div class="weather-error">Error ' + xhr.status + '</div>';
     }
   };
-  xhr.ontimeout = function() { card.innerHTML = '<div class="weather-error">⚠ Timed out</div>'; };
-  xhr.onerror   = function() { card.innerHTML = '<div class="weather-error">⚠ Network error</div>'; };
+  xhr.ontimeout = function() { card.innerHTML = '<div class="weather-error">Timed out</div>'; };
+  xhr.onerror   = function() { card.innerHTML = '<div class="weather-error">Network error</div>'; };
   xhr.send();
 }
 fetchWeather();
 setInterval(fetchWeather, 10 * 60 * 1000);
 
 // ─── NEWS ─────────────────────────────────────────────────────────────────────
-const NEWS_ROTATE_MS = 5 * 60 * 1000; // 5 minutes
-const NEWS_CATEGORIES = ['tech', 'science', 'business', 'sports'];
+var NEWS_ROTATE_MS  = 5 * 60 * 1000;
+var NEWS_CATEGORIES = ['tech', 'science', 'business', 'sports'];
 
-let newsCache = {}; // { category: [{title, source}] }
-let newsCurrentCat = 'tech';
-let newsRotateTimer = null;
-let newsCatIndex = 0;
-let newsCountdownInterval = null;
-let newsRotateAt = 0;
+var newsCache = {};
+var newsCurrentCat = 'tech';
+var newsRotateTimer = null;
+var newsCatIndex = 0;
+var newsCountdownInterval = null;
+var newsRotateAt = 0;
 
-// Google News RSS — reliable, US-focused, no auth required
-const newsFeeds = {
+var newsFeeds = {
   tech:     'https://news.google.com/rss/search?q=technology&hl=en-US&gl=US&ceid=US:en',
   science:  'https://news.google.com/rss/search?q=science&hl=en-US&gl=US&ceid=US:en',
   business: 'https://news.google.com/rss/search?q=business&hl=en-US&gl=US&ceid=US:en',
-  sports:   'https://news.google.com/rss/search?q=sports&hl=en-US&gl=US&ceid=US:en',
+  sports:   'https://news.google.com/rss/search?q=sports&hl=en-US&gl=US&ceid=US:en'
 };
 
-async function fetchWithProxy(feedUrl) {
-  const encoded = encodeURIComponent(feedUrl);
-  const proxies = [
-    { url: `https://api.allorigins.win/get?url=${encoded}`, json: true },
-    { url: `https://corsproxy.io/?url=${encoded}`,          json: false },
-  ];
-  for (const proxy of proxies) {
-    try {
-      const res = await fetch(proxy.url);
-      if (!res.ok) continue;
-      const text = await res.text();
-      if (proxy.json) {
-        const data = JSON.parse(text);
-        if (data.contents) return data.contents;
-      } else {
-        if (text.includes('<rss') || text.includes('<feed')) return text;
-      }
-    } catch(e) {
-      console.warn('Proxy failed:', proxy.url, e);
-    }
+// Manual XML item parser — DOMParser('text/xml') is unreliable on Kindle WebKit
+function parseRssItems(xml) {
+  var results = [];
+  // Find all <item>...</item> blocks
+  var itemRe = /<item[\s>][\s\S]*?<\/item>/gi;
+  var items = xml.match(itemRe);
+  if (!items) return results;
+  for (var i = 0; i < Math.min(items.length, 4); i++) {
+    var block = items[i];
+    // Extract <title>...</title> (handles CDATA)
+    var titleMatch = block.match(/<title>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/title>/i);
+    var raw = titleMatch ? titleMatch[1].replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').trim() : 'Untitled';
+    var dashIdx = raw.lastIndexOf(' - ');
+    results.push({
+      title:  dashIdx > 0 ? raw.slice(0, dashIdx) : raw,
+      source: dashIdx > 0 ? raw.slice(dashIdx + 3) : ''
+    });
   }
-  return null;
+  return results;
 }
 
-async function fetchNewsCategory(cat) {
-  if (newsCache[cat]) return newsCache[cat];
+// XHR-based fetch with two CORS proxies; no async/await
+function fetchWithProxyXhr(feedUrl, callback) {
+  var encoded = encodeURIComponent(feedUrl);
+  var proxies = [
+    { url: 'https://api.allorigins.win/get?url=' + encoded, json: true },
+    { url: 'https://corsproxy.io/?url=' + encoded,          json: false }
+  ];
+  var tried = 0;
 
-  try {
-    const xml = await fetchWithProxy(newsFeeds[cat]);
-    if (!xml) return [{ title: 'Could not load headlines — check connection.', source: '' }];
-
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(xml, 'text/xml');
-    const items = Array.from(doc.querySelectorAll('item')).slice(0, 4);
-
-    if (items.length === 0) {
-      return [{ title: 'No headlines available right now.', source: '' }];
-    }
-
-    // Google News titles are "Headline - Source Name", split on last " - "
-    const headlines = items.map(item => {
-      const raw = item.querySelector('title')?.textContent?.trim() || 'Untitled';
-      const dashIdx = raw.lastIndexOf(' - ');
-      return {
-        title:  dashIdx > 0 ? raw.slice(0, dashIdx) : raw,
-        source: dashIdx > 0 ? raw.slice(dashIdx + 3) : '',
-      };
-    });
-
-    newsCache[cat] = headlines;
-    return headlines;
-  } catch(e) {
-    console.error('News fetch error:', e);
-    return [{ title: 'Network error loading headlines.', source: '' }];
+  function tryNext() {
+    if (tried >= proxies.length) { callback(null); return; }
+    var proxy = proxies[tried++];
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', proxy.url, true);
+    xhr.timeout = 12000;
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState !== 4) return;
+      if (xhr.status === 200) {
+        var text = xhr.responseText;
+        try {
+          if (proxy.json) {
+            var data = JSON.parse(text);
+            if (data && data.contents) { callback(data.contents); return; }
+          } else {
+            if (text.indexOf('<rss') !== -1 || text.indexOf('<feed') !== -1) {
+              callback(text); return;
+            }
+          }
+        } catch(e) {}
+        tryNext();
+      } else {
+        tryNext();
+      }
+    };
+    xhr.ontimeout = tryNext;
+    xhr.onerror   = tryNext;
+    xhr.send();
   }
+  tryNext();
+}
+
+function fetchNewsCategory(cat, callback) {
+  if (newsCache[cat]) { callback(newsCache[cat]); return; }
+
+  fetchWithProxyXhr(newsFeeds[cat], function(xml) {
+    if (!xml) {
+      callback([{ title: 'Could not load headlines. Check connection.', source: '' }]);
+      return;
+    }
+    var headlines = parseRssItems(xml);
+    if (headlines.length === 0) {
+      headlines = [{ title: 'No headlines available right now.', source: '' }];
+    }
+    newsCache[cat] = headlines;
+    callback(headlines);
+  });
 }
 
 function renderNewsItems(headlines) {
-  const container = document.getElementById('newsItems');
+  var container = document.getElementById('newsItems');
   if (!headlines || headlines.length === 0) {
     container.innerHTML = '<div class="news-status">No headlines available</div>';
     return;
   }
-  container.innerHTML = headlines.map((h, i) => {
-    const title  = typeof h === 'object' ? h.title  : h;
-    const source = typeof h === 'object' ? h.source : '';
-    return `<div class="news-item" id="ni-${i}">
-      <span class="news-bullet">◆</span>
-      <span class="news-text">${title}${source ? `<span class="news-source">— ${source}</span>` : ''}</span>
-    </div>`;
-  }).join('');
-
-  // Stagger-animate items in
-  headlines.forEach((_, i) => {
-    setTimeout(() => {
-      const el = document.getElementById('ni-' + i);
-      if (el) el.classList.add('visible');
-    }, i * 80);
-  });
+  var html = '';
+  for (var i = 0; i < headlines.length; i++) {
+    var h = headlines[i];
+    var title  = typeof h === 'object' ? h.title  : h;
+    var source = typeof h === 'object' ? h.source : '';
+    html += '<div class="news-item">'
+      + '<span class="news-bullet">*</span>'
+      + '<span class="news-text">' + title
+      + (source ? '<span class="news-source">-- ' + source + '</span>' : '')
+      + '</span></div>';
+  }
+  container.innerHTML = html;
 }
 
-async function showNewsCategory(cat) {
+function showNewsCategory(cat) {
   newsCurrentCat = cat;
 
   // Update tab UI
-  document.querySelectorAll('.news-tab').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.cat === cat);
-  });
+  var tabs = document.getElementById('newsTabs').getElementsByTagName('button');
+  for (var i = 0; i < tabs.length; i++) {
+    tabs[i].className = tabs[i].getAttribute('data-cat') === cat
+      ? 'news-tab active' : 'news-tab';
+  }
 
-  // Show loading if no cache
   if (!newsCache[cat]) {
     document.getElementById('newsItems').innerHTML =
-      '<div class="news-status">Fetching ' + cat + ' headlines…</div>';
+      '<div class="news-status">Fetching ' + cat + ' headlines...</div>';
   }
 
-  const headlines = await fetchNewsCategory(cat);
-
-  // Only render if still on this category
-  if (newsCurrentCat === cat) {
-    renderNewsItems(headlines);
-  }
+  fetchNewsCategory(cat, function(headlines) {
+    if (newsCurrentCat === cat) renderNewsItems(headlines);
+  });
 }
 
 function startNewsRotation() {
-  if (newsRotateTimer) clearInterval(newsRotateTimer);
+  if (newsRotateTimer)       clearInterval(newsRotateTimer);
   if (newsCountdownInterval) clearInterval(newsCountdownInterval);
 
   newsRotateAt = Date.now() + NEWS_ROTATE_MS;
   startCountdown();
 
-  newsRotateTimer = setInterval(() => {
+  newsRotateTimer = setInterval(function() {
     newsCatIndex = (newsCatIndex + 1) % NEWS_CATEGORIES.length;
-    const nextCat = NEWS_CATEGORIES[newsCatIndex];
+    var nextCat = NEWS_CATEGORIES[newsCatIndex];
     showNewsCategory(nextCat);
     newsRotateAt = Date.now() + NEWS_ROTATE_MS;
     // Pre-fetch next
-    const afterNext = NEWS_CATEGORIES[(newsCatIndex + 1) % NEWS_CATEGORIES.length];
-    fetchNewsCategory(afterNext);
+    var afterNext = NEWS_CATEGORIES[(newsCatIndex + 1) % NEWS_CATEGORIES.length];
+    fetchNewsCategory(afterNext, function() {});
   }, NEWS_ROTATE_MS);
 }
 
 function startCountdown() {
   if (newsCountdownInterval) clearInterval(newsCountdownInterval);
-  const progress = document.getElementById('newsProgress');
+  var progress = document.getElementById('newsProgress');
 
-  newsCountdownInterval = setInterval(() => {
-    const remaining = Math.max(0, newsRotateAt - Date.now());
-    const pct = ((NEWS_ROTATE_MS - remaining) / NEWS_ROTATE_MS) * 100;
+  newsCountdownInterval = setInterval(function() {
+    var remaining = Math.max(0, newsRotateAt - Date.now());
+    var pct = ((NEWS_ROTATE_MS - remaining) / NEWS_ROTATE_MS) * 100;
     progress.style.width = pct + '%';
-    const secs = Math.ceil(remaining / 1000);
+    var secs = Math.ceil(remaining / 1000);
     document.getElementById('newsCountdown').textContent = secs + 's';
   }, 1000);
 }
 
-// Tab click — manual override switches to that category and resets timer
-document.querySelectorAll('.news-tab').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const cat = btn.dataset.cat;
-    newsCatIndex = NEWS_CATEGORIES.indexOf(cat);
-    showNewsCategory(cat);
-    newsRotateAt = Date.now() + NEWS_ROTATE_MS;
-    // restart progress bar
-    const progress = document.getElementById('newsProgress');
-    progress.style.transition = 'none';
-    progress.style.width = '0%';
-    setTimeout(() => progress.style.transition = '', 50);
-  });
-});
+// Tab click handlers (use onclick attribute since addEventListener may be flaky on old WebKit)
+var tabs = document.getElementById('newsTabs').getElementsByTagName('button');
+for (var ti = 0; ti < tabs.length; ti++) {
+  (function(btn) {
+    btn.onclick = function() {
+      var cat = btn.getAttribute('data-cat');
+      newsCatIndex = NEWS_CATEGORIES.indexOf(cat);
+      showNewsCategory(cat);
+      newsRotateAt = Date.now() + NEWS_ROTATE_MS;
+      var progress = document.getElementById('newsProgress');
+      progress.style.width = '0%';
+    };
+  })(tabs[ti]);
+}
 
 // Init news
-(async function initNews() {
-  // Load first category
-  await showNewsCategory('tech');
-  startNewsRotation();
-  // Pre-warm the others in background
-  for (const cat of ['science', 'business', 'sports']) {
-    setTimeout(() => fetchNewsCategory(cat), 2000);
-  }
-  // Refresh all caches every hour
-  setInterval(() => { newsCache = {}; }, 60 * 60 * 1000);
-})();
+showNewsCategory('tech');
+// Stagger so the first request isn't competing
+setTimeout(startNewsRotation, 500);
+setTimeout(function() { fetchNewsCategory('science',  function(){}); }, 2000);
+setTimeout(function() { fetchNewsCategory('business', function(){}); }, 3500);
+setTimeout(function() { fetchNewsCategory('sports',   function(){}); }, 5000);
+// Refresh caches every hour
+setInterval(function() { newsCache = {}; }, 60 * 60 * 1000);
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 applyRotation();
