@@ -811,42 +811,62 @@ let newsCatIndex = 0;
 let newsCountdownInterval = null;
 let newsRotateAt = 0;
 
-// RSS feeds parsed directly — uses allorigins.win as a CORS proxy
-// No API key needed, no third-party JSON converter
+// Google News RSS — reliable, US-focused, no auth required
 const newsFeeds = {
-  tech:     'https://feeds.bbci.co.uk/news/technology/rss.xml',
-  science:  'https://feeds.bbci.co.uk/news/science_and_environment/rss.xml',
-  business: 'https://feeds.bbci.co.uk/news/business/rss.xml',
-  sports:   'https://feeds.bbci.co.uk/news/sport/rss.xml',
+  tech:     'https://news.google.com/rss/search?q=technology&hl=en-US&gl=US&ceid=US:en',
+  science:  'https://news.google.com/rss/search?q=science&hl=en-US&gl=US&ceid=US:en',
+  business: 'https://news.google.com/rss/search?q=business&hl=en-US&gl=US&ceid=US:en',
+  sports:   'https://news.google.com/rss/search?q=sports&hl=en-US&gl=US&ceid=US:en',
 };
+
+async function fetchWithProxy(feedUrl) {
+  const encoded = encodeURIComponent(feedUrl);
+  const proxies = [
+    { url: `https://api.allorigins.win/get?url=${encoded}`, json: true },
+    { url: `https://corsproxy.io/?url=${encoded}`,          json: false },
+  ];
+  for (const proxy of proxies) {
+    try {
+      const res = await fetch(proxy.url);
+      if (!res.ok) continue;
+      const text = await res.text();
+      if (proxy.json) {
+        const data = JSON.parse(text);
+        if (data.contents) return data.contents;
+      } else {
+        if (text.includes('<rss') || text.includes('<feed')) return text;
+      }
+    } catch(e) {
+      console.warn('Proxy failed:', proxy.url, e);
+    }
+  }
+  return null;
+}
 
 async function fetchNewsCategory(cat) {
   if (newsCache[cat]) return newsCache[cat];
 
   try {
-    const feedUrl = encodeURIComponent(newsFeeds[cat]);
-    const proxyUrl = `https://api.allorigins.win/get?url=${feedUrl}`;
-    const res = await fetch(proxyUrl);
-    const json = await res.json();
+    const xml = await fetchWithProxy(newsFeeds[cat]);
+    if (!xml) return [{ title: 'Could not load headlines — check connection.', source: '' }];
 
-    if (!json.contents) {
-      return [{ title: 'No headlines available right now.', source: '' }];
-    }
-
-    // Parse the RSS XML
     const parser = new DOMParser();
-    const xml = parser.parseFromString(json.contents, 'text/xml');
-    const items = Array.from(xml.querySelectorAll('item')).slice(0, 4);
+    const doc = parser.parseFromString(xml, 'text/xml');
+    const items = Array.from(doc.querySelectorAll('item')).slice(0, 4);
 
     if (items.length === 0) {
       return [{ title: 'No headlines available right now.', source: '' }];
     }
 
-    const feedTitle = xml.querySelector('channel > title')?.textContent || '';
-    const headlines = items.map(item => ({
-      title: item.querySelector('title')?.textContent?.trim() || 'Untitled',
-      source: feedTitle
-    }));
+    // Google News titles are "Headline - Source Name", split on last " - "
+    const headlines = items.map(item => {
+      const raw = item.querySelector('title')?.textContent?.trim() || 'Untitled';
+      const dashIdx = raw.lastIndexOf(' - ');
+      return {
+        title:  dashIdx > 0 ? raw.slice(0, dashIdx) : raw,
+        source: dashIdx > 0 ? raw.slice(dashIdx + 3) : '',
+      };
+    });
 
     newsCache[cat] = headlines;
     return headlines;
@@ -954,7 +974,7 @@ document.querySelectorAll('.news-tab').forEach(btn => {
   await showNewsCategory('tech');
   startNewsRotation();
   // Pre-warm the others in background
-  for (const cat of ['science', 'business', 'sportxs']) {
+  for (const cat of ['science', 'business', 'sports']) {
     setTimeout(() => fetchNewsCategory(cat), 2000);
   }
   // Refresh all caches every hour
