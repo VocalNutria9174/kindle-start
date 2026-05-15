@@ -40,8 +40,8 @@
     display: flex;
     -webkit-flex-wrap: wrap;
     flex-wrap: wrap;
-    gap: 14px;
-    padding: 16px 16px 70px 16px;
+    gap: 20px;
+    padding: 18px 18px 70px 18px;
     max-width: 760px;
     width: 100%;
   }
@@ -53,7 +53,7 @@
     display: flex;
     -webkit-flex-direction: row;
     flex-direction: row;
-    gap: 14px;
+    gap: 20px;
     width: 100%;
   }
 
@@ -359,9 +359,9 @@
   }
 
   .news-bullet {
-    font-size: 8px;
+    font-size: 13px;
     color: #e05555;
-    margin-top: 3px;
+    margin-top: 0px;
     -webkit-flex-shrink: 0;
     flex-shrink: 0;
   }
@@ -579,7 +579,6 @@
             <button class="news-tab" data-cat="business">BIZ</button>
             <button class="news-tab" data-cat="sports">SPORT</button>
           </div>
-          <div class="news-countdown" id="newsCountdown"></div>
         </div>
         <div class="news-items" id="newsItems">
           <div class="news-status">Loading headlines...</div>
@@ -841,21 +840,21 @@ var API_KEY = '0264a07ef00385ae3a6ea69858c85c52';
 
 // Text-based weather icons — emoji are unreliable on Kindle e-ink
 var weatherIcons = {
-  'Clear':        '[SUN]',
-  'Clouds':       '[CLD]',
-  'Rain':         '[RAN]',
-  'Drizzle':      '[DRZ]',
-  'Thunderstorm': '[STM]',
-  'Snow':         '[SNW]',
-  'Mist':         '[MST]',
-  'Fog':          '[FOG]',
-  'Haze':         '[HAZ]',
-  'Smoke':        '[SMK]',
-  'Dust':         '[DST]',
-  'Sand':         '[SND]',
-  'Ash':          '[ASH]',
-  'Squall':       '[SQU]',
-  'Tornado':      '[TRN]'
+  'Clear':        '☀️',
+  'Clouds':       '☁️',
+  'Rain':         '🌧️',
+  'Drizzle':      '🌦️',
+  'Thunderstorm': '⛈️',
+  'Snow':         '❄️',
+  'Mist':         '🌫️',
+  'Fog':          '🌫️',
+  'Haze':         '🌁',
+  'Smoke':        '🌫️',
+  'Dust':         '💨',
+  'Sand':         '💨',
+  'Ash':          '🌋',
+  'Squall':       '💨',
+  'Tornado':      '🌪️'
 };
 
 function fetchWeather() {
@@ -885,7 +884,7 @@ function fetchWeather() {
         var humidity = data.main.humidity;
         var windSpeed = Math.round(data.wind.speed);
         var wind = unit === 'imperial' ? (windSpeed + ' mph') : (windSpeed + ' m/s');
-        var icon = weatherIcons[main] || '[WX]';
+        var icon = weatherIcons[main] || '🌡️';
         card.innerHTML =
           '<div class="weather-city">' + data.name.toUpperCase() + '</div>' +
           '<div class="weather-icon">' + icon + '</div>' +
@@ -1023,7 +1022,7 @@ function renderNewsItems(headlines) {
     var title  = typeof h === 'object' ? h.title  : h;
     var source = typeof h === 'object' ? h.source : '';
     html += '<div class="news-item">'
-      + '<span class="news-bullet">*</span>'
+      + '<span class="news-bullet">&#8250;</span>'
       + '<span class="news-text">' + title
       + (source ? '<span class="news-source">-- ' + source + '</span>' : '')
       + '</span></div>';
@@ -1077,8 +1076,6 @@ function startCountdown() {
     var remaining = Math.max(0, newsRotateAt - Date.now());
     var pct = ((NEWS_ROTATE_MS - remaining) / NEWS_ROTATE_MS) * 100;
     progress.style.width = pct + '%';
-    var secs = Math.ceil(remaining / 1000);
-    document.getElementById('newsCountdown').textContent = secs + 's';
   }, 1000);
 }
 
