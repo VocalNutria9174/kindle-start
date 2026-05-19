@@ -513,6 +513,356 @@
     border-radius: 0 0 0 18px;
   }
 
+  /* ============ SPORTS PANEL ============ */
+  .sports-card {
+    width: 100%;
+    border-radius: 18px;
+    background: #1a1a1a;
+    padding: 14px 16px;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 120px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .sports-header {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-box-pack: justify;
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .sports-title {
+    font-family: 'Courier New', monospace;
+    font-size: 8px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #555555;
+  }
+
+  .sports-league-label {
+    font-family: 'Courier New', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #e05555;
+    font-weight: bold;
+  }
+
+  .sports-cycle-info {
+    font-family: 'Courier New', monospace;
+    font-size: 8px;
+    color: #444;
+    letter-spacing: 0.04em;
+  }
+
+  /* Container for 3-game display */
+  .sports-games {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+    gap: 8px;
+    width: 100%;
+  }
+
+  /* ── MLB game tile ── */
+  .mlb-game {
+    -webkit-box-flex: 1;
+    -webkit-flex: 1 1 0;
+    flex: 1 1 0;
+    background: #222222;
+    border-radius: 10px;
+    padding: 8px 10px;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .mlb-teams {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .mlb-team-row {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-box-pack: justify;
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+    gap: 4px;
+  }
+
+  .mlb-abbr {
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    font-weight: bold;
+    color: #cccccc;
+    letter-spacing: 0.06em;
+    min-width: 26px;
+  }
+
+  .mlb-score {
+    font-family: Georgia, serif;
+    font-size: 14px;
+    font-weight: bold;
+    color: #ffffff;
+    letter-spacing: -0.01em;
+  }
+
+  .mlb-score.winning { color: #55cc88; }
+
+  .mlb-divider {
+    height: 1px;
+    background: #333;
+    width: 100%;
+    margin: 1px 0;
+  }
+
+  .mlb-meta {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 2px;
+  }
+
+  .mlb-inning {
+    font-family: 'Courier New', monospace;
+    font-size: 8px;
+    color: #aaaaaa;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .mlb-bases {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+    gap: 3px;
+    margin: 1px 0;
+  }
+
+  /* diamond-shaped bases using rotated squares */
+  .base-diamond {
+    width: 8px;
+    height: 8px;
+    border: 1.5px solid #555;
+    -webkit-transform: rotate(45deg);
+    transform: rotate(45deg);
+    border-radius: 1px;
+    display: inline-block;
+  }
+  .base-diamond.occupied { background: #e05555; border-color: #e05555; }
+
+  .mlb-outs {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+    gap: 3px;
+  }
+
+  .out-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    border: 1.5px solid #555;
+    display: inline-block;
+  }
+  .out-dot.recorded { background: #e05555; border-color: #e05555; }
+
+  .mlb-status {
+    font-family: 'Courier New', monospace;
+    font-size: 8px;
+    color: #888;
+    text-align: center;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  /* ── NBA/NHL game tile ── */
+  .nba-game, .nhl-game {
+    -webkit-box-flex: 1;
+    -webkit-flex: 1 1 0;
+    flex: 1 1 0;
+    background: #222222;
+    border-radius: 10px;
+    padding: 8px 10px;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .nba-team-row, .nhl-team-row {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-box-pack: justify;
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+    gap: 4px;
+  }
+
+  .nba-team-info, .nhl-team-info {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+    gap: 5px;
+    min-width: 0;
+    -webkit-box-flex: 1;
+    -webkit-flex: 1;
+    flex: 1;
+  }
+
+  .nba-logo, .nhl-logo {
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+    -webkit-flex-shrink: 0;
+    flex-shrink: 0;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+    font-family: 'Courier New', monospace;
+    font-size: 7px;
+    font-weight: bold;
+    color: #ffffff;
+    letter-spacing: 0;
+    text-align: center;
+  }
+
+  .nba-abbr, .nhl-abbr {
+    font-family: 'Courier New', monospace;
+    font-size: 9px;
+    font-weight: bold;
+    color: #cccccc;
+    letter-spacing: 0.04em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .nba-score, .nhl-score {
+    font-family: Georgia, serif;
+    font-size: 14px;
+    font-weight: bold;
+    color: #ffffff;
+    letter-spacing: -0.01em;
+    -webkit-flex-shrink: 0;
+    flex-shrink: 0;
+  }
+
+  .nba-score.winning, .nhl-score.winning { color: #55cc88; }
+
+  .nba-divider, .nhl-divider {
+    height: 1px;
+    background: #333;
+    width: 100%;
+    margin: 1px 0;
+  }
+
+  .nba-meta, .nhl-meta {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 1px;
+  }
+
+  .nba-clock, .nhl-clock {
+    font-family: 'Courier New', monospace;
+    font-size: 9px;
+    color: #e05555;
+    letter-spacing: 0.05em;
+    text-align: center;
+    font-weight: bold;
+  }
+
+  .nba-period, .nhl-period {
+    font-family: 'Courier New', monospace;
+    font-size: 8px;
+    color: #888;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .sports-status {
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    color: #555;
+    text-align: center;
+    padding: 8px 0;
+    letter-spacing: 0.05em;
+  }
+
+  .sports-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    background: #e05555;
+    width: 0%;
+    border-radius: 0 0 0 18px;
+  }
+
   /* ============ SETTINGS BAR ============ */
   /* position:fixed is broken on Kindle — use sticky in flow instead */
   .settings-bar {
@@ -695,8 +1045,8 @@
 
       </div><!-- /top-row -->
 
-      <!-- NEWS PANEL -->
-      <div class="news-card" id="newsCard">
+      <!-- NEWS / SPORTS PANEL (swappable) -->
+      <div id="newsCard" class="news-card">
         <div class="news-header">
           <div class="news-category-tabs" id="newsTabs">
             <button class="news-tab active" data-cat="tech">TECH</button>
@@ -709,6 +1059,19 @@
           <div class="news-status">Loading headlines...</div>
         </div>
         <div class="news-progress" id="newsProgress"></div>
+      </div>
+
+      <!-- SPORTS CARD (hidden by default) -->
+      <div id="sportsCard" class="sports-card" style="display:none;">
+        <div class="sports-header">
+          <div class="sports-title">Scores</div>
+          <div class="sports-league-label" id="sportsLeagueLabel">MLB</div>
+          <div class="sports-cycle-info" id="sportsCycleInfo"></div>
+        </div>
+        <div class="sports-games" id="sportsGames">
+          <div class="sports-status">Loading scores...</div>
+        </div>
+        <div class="sports-progress" id="sportsProgress"></div>
       </div>
 
       <!-- Settings bar (in-flow, not fixed) -->
@@ -784,6 +1147,23 @@
         </select>
       </div>
 
+      <div>
+        <label>Bottom Block</label>
+        <select id="settingBottomBlock" onchange="onBottomBlockChange()">
+          <option value="news">News</option>
+          <option value="sports">Sports Scores</option>
+        </select>
+      </div>
+
+      <div id="settingSportRow" style="display:none;">
+        <label>Sport League</label>
+        <select id="settingSport">
+          <option value="mlb">MLB — Baseball</option>
+          <option value="nba">NBA — Basketball</option>
+          <option value="nhl">NHL — Hockey</option>
+        </select>
+      </div>
+
       <br>
       <div class="settings-row">
         <button class="settings-save" id="settingsSaveBtn">Save</button>
@@ -830,31 +1210,50 @@ function savePrefs(obj) {
 }
 
 var prefs = loadPrefs();
-if (!prefs.city)              prefs.city     = 'Atlanta';
-if (!prefs.unit)              prefs.unit     = 'imperial';
-if (!prefs.rotation)          prefs.rotation = '0';
+if (!prefs.city)              prefs.city        = 'Atlanta';
+if (!prefs.unit)              prefs.unit        = 'imperial';
+if (!prefs.rotation)          prefs.rotation    = '0';
 if (prefs.tzOffset === undefined) prefs.tzOffset = -5;
+if (!prefs.bottomBlock)       prefs.bottomBlock = 'news';
+if (!prefs.sport)             prefs.sport       = 'mlb';
 
 // ─── SETTINGS UI ─────────────────────────────────────────────────────────────
+function onBottomBlockChange() {
+  var val = document.getElementById('settingBottomBlock').value;
+  document.getElementById('settingSportRow').style.display = val === 'sports' ? 'block' : 'none';
+}
+
 function openSettings() {
-  document.getElementById('settingCity').value     = prefs.city;
-  document.getElementById('settingUnit').value     = prefs.unit;
-  document.getElementById('settingRotation').value = prefs.rotation;
-  document.getElementById('settingTimezone').value = String(prefs.tzOffset);
+  document.getElementById('settingCity').value        = prefs.city;
+  document.getElementById('settingUnit').value        = prefs.unit;
+  document.getElementById('settingRotation').value   = prefs.rotation;
+  document.getElementById('settingTimezone').value   = String(prefs.tzOffset);
+  document.getElementById('settingBottomBlock').value = prefs.bottomBlock;
+  document.getElementById('settingSport').value       = prefs.sport;
+  onBottomBlockChange();
   document.getElementById('settingsPanel').className = 'settings-panel open';
 }
 function closeSettings() {
   document.getElementById('settingsPanel').className = 'settings-panel';
 }
 function saveSettings() {
-  prefs.city     = document.getElementById('settingCity').value || 'Atlanta';
-  prefs.unit     = document.getElementById('settingUnit').value;
-  prefs.rotation = document.getElementById('settingRotation').value;
-  prefs.tzOffset = parseFloat(document.getElementById('settingTimezone').value);
+  var oldBlock = prefs.bottomBlock;
+  var oldSport = prefs.sport;
+  prefs.city        = document.getElementById('settingCity').value || 'Atlanta';
+  prefs.unit        = document.getElementById('settingUnit').value;
+  prefs.rotation    = document.getElementById('settingRotation').value;
+  prefs.tzOffset    = parseFloat(document.getElementById('settingTimezone').value);
+  prefs.bottomBlock = document.getElementById('settingBottomBlock').value;
+  prefs.sport       = document.getElementById('settingSport').value;
   savePrefs(prefs);
   closeSettings();
   applyRotation();
   fetchWeather();
+  // Switch bottom block if needed
+  applyBottomBlock();
+  if (prefs.bottomBlock === 'sports' && (oldBlock !== 'sports' || oldSport !== prefs.sport)) {
+    initSports();
+  }
 }
 
 document.getElementById('settingsOpenBtn').onclick  = openSettings;
@@ -1371,8 +1770,395 @@ setTimeout(function() { fetchNewsCategory('sports',   function(){}); }, 5000);
 // Refresh caches every hour
 setInterval(function() { newsCache = {}; }, 60 * 60 * 1000);
 
+// ─── BOTTOM BLOCK SWITCHER ────────────────────────────────────────────────────
+function applyBottomBlock() {
+  var newsCard   = document.getElementById('newsCard');
+  var sportsCard = document.getElementById('sportsCard');
+  if (prefs.bottomBlock === 'sports') {
+    newsCard.style.display   = 'none';
+    sportsCard.style.display = '';
+  } else {
+    newsCard.style.display   = '';
+    sportsCard.style.display = 'none';
+  }
+}
+
+// ─── SPORTS ENGINE ────────────────────────────────────────────────────────────
+// Uses allorigins proxy → SportRadar via a public scores API.
+// Falls back to embedded mock data when offline.
+
+var SPORTS_CYCLE_MS = 25000; // 25 seconds per "page" of 3 games
+
+var sportsState = {
+  league:       'mlb',
+  games:        [],
+  pageIndex:    0,
+  cycleTimer:   null,
+  countdownInt: null,
+  cycleAt:      0,
+  fetchTimer:   null
+};
+
+// MLB team colors (primary) for visual identity
+var MLB_COLORS = {
+  'ATH':'#003831','SF':'#FD5A1E','TB':'#092C5C','MIA':'#00A3E0','ATL':'#CE1141',
+  'BOS':'#BD3039','PIT':'#FDB827','PHI':'#E81828','WSH':'#AB0003','BAL':'#DF4601',
+  'NYM':'#002D72','NYY':'#003087','CLE':'#00385D','CIN':'#C6011F','DET':'#0C2C56',
+  'TOR':'#134A8E','MIN':'#002B5C','MIL':'#FFC52F','CWS':'#27251F','CHC':'#0E3386',
+  'HOU':'#002D62','STL':'#C41E3A','KC':'#004687','COL':'#33006F','AZ':'#A71930',
+  'SEA':'#0C2C56','SD':'#2F241D','LAD':'#005A9C','LAA':'#BA0021','TEX':'#003278',
+  'NYM':'#002D72','SF':'#FD5A1E'
+};
+
+// NBA team colors
+var NBA_COLORS = {
+  'BOS':'#007A33','BKN':'#000000','NYK':'#F58426','PHI':'#006BB6','TOR':'#CE1141',
+  'CHI':'#CE1141','CLE':'#6F263D','DET':'#C8102E','IND':'#002D62','MIL':'#00471B',
+  'ATL':'#E03A3E','CHA':'#1D1160','MIA':'#98002E','ORL':'#0077C0','WAS':'#002B5C',
+  'DEN':'#0E2240','MIN':'#0C2340','OKC':'#007AC1','POR':'#E03A3E','UTA':'#002B5C',
+  'GSW':'#1D428A','LAC':'#C8102E','LAL':'#552583','PHX':'#1D1160','SAC':'#5A2D81',
+  'DAL':'#00538C','HOU':'#CE1141','MEM':'#5D76A9','NOP':'#0C2340','SAS':'#C4CED4'
+};
+
+// NHL team colors
+var NHL_COLORS = {
+  'BOS':'#FFB81C','BUF':'#003087','DET':'#CE1126','FLA':'#C8102E','MTL':'#AF1E2D',
+  'OTT':'#C52032','TBL':'#002868','TOR':'#00205B','CAR':'#CC0000','CBJ':'#002654',
+  'NJD':'#CE1126','NYI':'#003087','NYR':'#0038A8','PHI':'#F74902','PIT':'#CFC493',
+  'WSH':'#041E42','CHI':'#CF0A2C','COL':'#6F263D','DAL':'#006847','MIN':'#154734',
+  'NSH':'#FFB81C','STL':'#002F87','WPG':'#041E42','ANA':'#FC4C02','ARI':'#8C2633',
+  'CGY':'#C8102E','EDM':'#FF4C00','LAK':'#111111','SJS':'#006D75','SEA':'#99D9D9',
+  'VAN':'#00843D','VGK':'#B4975A'
+};
+
+function colorFor(league, abbr) {
+  if (league === 'mlb') return MLB_COLORS[abbr] || '#333333';
+  if (league === 'nba') return NBA_COLORS[abbr] || '#333333';
+  if (league === 'nhl') return NHL_COLORS[abbr] || '#333333';
+  return '#333333';
+}
+
+// Fetch scores via allorigins → our own API endpoint
+// We embed the SportRadar-compatible public endpoint used by ESPN widgets.
+// As a Kindle-safe fallback we use allorigins to proxy ESPN's public API.
+function fetchSportsScores(league, callback) {
+  var espnSport = { mlb: 'baseball/mlb', nba: 'basketball/nba', nhl: 'hockey/nhl' }[league];
+  if (!espnSport) { callback([]); return; }
+
+  var apiUrl = 'https://site.api.espn.com/apis/site/v2/sports/' + espnSport + '/scoreboard';
+  var proxied = 'https://api.allorigins.win/get?url=' + encodeURIComponent(apiUrl);
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', proxied, true);
+  xhr.timeout = 15000;
+
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState !== 4) return;
+    if (xhr.status === 200) {
+      try {
+        var wrapper = JSON.parse(xhr.responseText);
+        var raw = wrapper.contents || xhr.responseText;
+        var data = JSON.parse(raw);
+        var games = parseEspnScoreboard(league, data);
+        callback(games);
+      } catch(e) {
+        callback([]);
+      }
+    } else {
+      // Try direct (some Kindle firmwares allow it)
+      var xhr2 = new XMLHttpRequest();
+      xhr2.open('GET', apiUrl, true);
+      xhr2.timeout = 12000;
+      xhr2.onreadystatechange = function() {
+        if (xhr2.readyState !== 4) return;
+        if (xhr2.status === 200) {
+          try {
+            var data = JSON.parse(xhr2.responseText);
+            callback(parseEspnScoreboard(league, data));
+          } catch(e2) { callback([]); }
+        } else { callback([]); }
+      };
+      xhr2.ontimeout = function() { callback([]); };
+      xhr2.onerror   = function() { callback([]); };
+      xhr2.send();
+    }
+  };
+  xhr.ontimeout = function() { callback([]); };
+  xhr.onerror   = function() { callback([]); };
+  xhr.send();
+}
+
+function parseEspnScoreboard(league, data) {
+  var events = data.events || [];
+  var games = [];
+  for (var i = 0; i < events.length; i++) {
+    var ev = events[i];
+    var comps = ev.competitions && ev.competitions[0];
+    if (!comps) continue;
+    var competitors = comps.competitors || [];
+    var status = comps.status || {};
+    var statusType = status.type || {};
+    var state = statusType.state || 'pre'; // pre / in / post
+
+    var home = null, away = null;
+    for (var j = 0; j < competitors.length; j++) {
+      var c = competitors[j];
+      if (c.homeAway === 'home') home = c;
+      else away = c;
+    }
+    if (!home || !away) continue;
+
+    var game = {
+      id:        ev.id,
+      state:     state,
+      homeAbbr:  home.team.abbreviation || '???',
+      awayAbbr:  away.team.abbreviation || '???',
+      homeName:  home.team.shortDisplayName || home.team.name || '',
+      awayName:  away.team.shortDisplayName || away.team.name || '',
+      homeScore: parseInt(home.score || '0', 10),
+      awayScore: parseInt(away.score || '0', 10),
+      displayClock:  status.displayClock || '',
+      period:        status.period || 0,
+      statusDetail:  statusType.shortDetail || statusType.description || ''
+    };
+
+    // MLB specifics
+    if (league === 'mlb') {
+      var sit = comps.situation || {};
+      game.inning    = sit.period || game.period;
+      game.inningHalf = (sit.isTopInning !== undefined ? (sit.isTopInning ? 'TOP' : 'BOT') : '');
+      game.outs      = sit.outs || 0;
+      game.onFirst   = !!(sit.onFirst);
+      game.onSecond  = !!(sit.onSecond);
+      game.onThird   = !!(sit.onThird);
+    }
+
+    games.push(game);
+  }
+  return games;
+}
+
+// ── Renderers ──
+function renderMlbGame(game) {
+  var homeWin = game.homeScore > game.awayScore;
+  var awayWin = game.awayScore > game.homeScore;
+  var inningStr = '';
+  if (game.state === 'in') {
+    inningStr = (game.inningHalf || '') + ' ' + ordinal(game.inning || game.period);
+  } else if (game.state === 'post') {
+    inningStr = 'FINAL';
+  } else {
+    inningStr = 'UPCOMING';
+  }
+
+  var basesHtml = '<div class="mlb-bases">'
+    + '<div class="base-diamond' + (game.onThird  ? ' occupied' : '') + '"></div>'
+    + '<div class="base-diamond' + (game.onSecond ? ' occupied' : '') + '"></div>'
+    + '<div class="base-diamond' + (game.onFirst  ? ' occupied' : '') + '"></div>'
+    + '</div>';
+
+  var outsHtml = '<div class="mlb-outs">';
+  for (var o = 0; o < 3; o++) {
+    outsHtml += '<div class="out-dot' + (o < (game.outs || 0) ? ' recorded' : '') + '"></div>';
+  }
+  outsHtml += '</div>';
+
+  var homeColor = colorFor('mlb', game.homeAbbr);
+  var awayColor = colorFor('mlb', game.awayAbbr);
+
+  return '<div class="mlb-game">'
+    + '<div class="mlb-teams">'
+    + '<div class="mlb-team-row">'
+    + '<div class="mlb-abbr" style="color:' + teamTextColor(awayColor) + ';background:' + awayColor + ';border-radius:4px;padding:1px 3px;">' + game.awayAbbr + '</div>'
+    + '<div class="mlb-score' + (awayWin ? ' winning' : '') + '">' + game.awayScore + '</div>'
+    + '</div>'
+    + '<div class="mlb-divider"></div>'
+    + '<div class="mlb-team-row">'
+    + '<div class="mlb-abbr" style="color:' + teamTextColor(homeColor) + ';background:' + homeColor + ';border-radius:4px;padding:1px 3px;">' + game.homeAbbr + '</div>'
+    + '<div class="mlb-score' + (homeWin ? ' winning' : '') + '">' + game.homeScore + '</div>'
+    + '</div>'
+    + '</div>'
+    + '<div class="mlb-meta">'
+    + '<div class="mlb-inning">' + inningStr + '</div>'
+    + (game.state === 'in' ? basesHtml + outsHtml : '')
+    + '</div>'
+    + '</div>';
+}
+
+function renderNbaGame(game) {
+  return renderBracketGame('nba', game);
+}
+function renderNhlGame(game) {
+  return renderBracketGame('nhl', game);
+}
+
+function renderBracketGame(league, game) {
+  var homeWin = game.homeScore > game.awayScore;
+  var awayWin = game.awayScore > game.homeScore;
+  var homeColor = colorFor(league, game.homeAbbr);
+  var awayColor = colorFor(league, game.awayAbbr);
+
+  var periodLabel = '';
+  var clockLabel  = '';
+  if (game.state === 'in') {
+    clockLabel  = game.displayClock || '';
+    if (league === 'nba') {
+      periodLabel = ordinal(game.period) + ' QTR';
+    } else {
+      periodLabel = ordinal(game.period) + ' PER';
+    }
+  } else if (game.state === 'post') {
+    clockLabel  = 'FINAL';
+    periodLabel = '';
+  } else {
+    clockLabel  = 'UPCOMING';
+    periodLabel = game.statusDetail || '';
+  }
+
+  var cls = league + '-game';
+  var rowCls = league + '-team-row';
+  var infoCls = league + '-team-info';
+  var logoCls = league + '-logo';
+  var abbrCls = league + '-abbr';
+  var scoreCls = league + '-score';
+  var divCls  = league + '-divider';
+  var metaCls = league + '-meta';
+  var clockCls = league + '-clock';
+  var perCls  = league + '-period';
+
+  return '<div class="' + cls + '">'
+    + '<div class="' + rowCls + '">'
+    + '<div class="' + infoCls + '">'
+    + '<div class="' + logoCls + '" style="background:' + awayColor + ';color:' + teamTextColor(awayColor) + '">' + game.awayAbbr + '</div>'
+    + '<div class="' + abbrCls + '">' + (game.awayName || game.awayAbbr) + '</div>'
+    + '</div>'
+    + '<div class="' + scoreCls + (awayWin ? ' winning' : '') + '">' + game.awayScore + '</div>'
+    + '</div>'
+    + '<div class="' + divCls + '"></div>'
+    + '<div class="' + rowCls + '">'
+    + '<div class="' + infoCls + '">'
+    + '<div class="' + logoCls + '" style="background:' + homeColor + ';color:' + teamTextColor(homeColor) + '">' + game.homeAbbr + '</div>'
+    + '<div class="' + abbrCls + '">' + (game.homeName || game.homeAbbr) + '</div>'
+    + '</div>'
+    + '<div class="' + scoreCls + (homeWin ? ' winning' : '') + '">' + game.homeScore + '</div>'
+    + '</div>'
+    + '<div class="' + metaCls + '">'
+    + '<div class="' + clockCls + '">' + clockLabel + '</div>'
+    + (periodLabel ? '<div class="' + perCls + '">' + periodLabel + '</div>' : '')
+    + '</div>'
+    + '</div>';
+}
+
+// Simple ordinal: 1→1ST, 2→2ND, 3→3RD, 4→4TH etc.
+function ordinal(n) {
+  var s = ['TH','ST','ND','RD'];
+  var v = n % 100;
+  return n + (s[(v-20)%10] || s[v] || s[0]);
+}
+
+// Returns white or black text for a given bg color (hex)
+function teamTextColor(hex) {
+  hex = hex.replace('#','');
+  if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+  var r = parseInt(hex.substr(0,2),16);
+  var g = parseInt(hex.substr(2,2),16);
+  var b = parseInt(hex.substr(4,2),16);
+  var lum = (0.299*r + 0.587*g + 0.114*b) / 255;
+  return lum > 0.55 ? '#111111' : '#ffffff';
+}
+
+function renderSportsPage() {
+  var league  = sportsState.league;
+  var games   = sportsState.games;
+  var pageIdx = sportsState.pageIndex;
+  var gamesEl = document.getElementById('sportsGames');
+  var cycleEl = document.getElementById('sportsCycleInfo');
+
+  if (!games || games.length === 0) {
+    gamesEl.innerHTML = '<div class="sports-status">No games available</div>';
+    cycleEl.textContent = '';
+    return;
+  }
+
+  var totalPages = Math.ceil(games.length / 3);
+  var start = pageIdx * 3;
+  var slice = games.slice(start, start + 3);
+
+  // Pad to 3 if fewer
+  var html = '';
+  for (var i = 0; i < slice.length; i++) {
+    var g = slice[i];
+    if (league === 'mlb')      html += renderMlbGame(g);
+    else if (league === 'nba') html += renderNbaGame(g);
+    else if (league === 'nhl') html += renderNhlGame(g);
+  }
+  gamesEl.innerHTML = html || '<div class="sports-status">No games on this page</div>';
+
+  if (totalPages > 1) {
+    cycleEl.textContent = (pageIdx + 1) + '/' + totalPages;
+  } else {
+    cycleEl.textContent = '';
+  }
+}
+
+function startSportsCycle() {
+  if (sportsState.cycleTimer)   clearInterval(sportsState.cycleTimer);
+  if (sportsState.countdownInt) clearInterval(sportsState.countdownInt);
+  if (sportsState.games.length <= 3) return; // only cycle if >3 games
+
+  sportsState.cycleAt = Date.now() + SPORTS_CYCLE_MS;
+
+  sportsState.countdownInt = setInterval(function() {
+    var remaining = Math.max(0, sportsState.cycleAt - Date.now());
+    var pct = ((SPORTS_CYCLE_MS - remaining) / SPORTS_CYCLE_MS) * 100;
+    var bar = document.getElementById('sportsProgress');
+    if (bar) bar.style.width = pct + '%';
+  }, 500);
+
+  sportsState.cycleTimer = setInterval(function() {
+    var totalPages = Math.ceil(sportsState.games.length / 3);
+    sportsState.pageIndex = (sportsState.pageIndex + 1) % totalPages;
+    renderSportsPage();
+    sportsState.cycleAt = Date.now() + SPORTS_CYCLE_MS;
+    var bar = document.getElementById('sportsProgress');
+    if (bar) bar.style.width = '0%';
+  }, SPORTS_CYCLE_MS);
+}
+
+function initSports() {
+  if (sportsState.cycleTimer)   { clearInterval(sportsState.cycleTimer);   sportsState.cycleTimer = null; }
+  if (sportsState.countdownInt) { clearInterval(sportsState.countdownInt); sportsState.countdownInt = null; }
+  if (sportsState.fetchTimer)   { clearInterval(sportsState.fetchTimer);   sportsState.fetchTimer = null; }
+
+  var league = prefs.sport || 'mlb';
+  sportsState.league    = league;
+  sportsState.games     = [];
+  sportsState.pageIndex = 0;
+
+  document.getElementById('sportsLeagueLabel').textContent = league.toUpperCase();
+  document.getElementById('sportsGames').innerHTML = '<div class="sports-status">Loading scores...</div>';
+  document.getElementById('sportsProgress').style.width = '0%';
+
+  function doFetch() {
+    fetchSportsScores(league, function(games) {
+      if (sportsState.league !== league) return; // league changed
+      sportsState.games = games;
+      sportsState.pageIndex = 0;
+      renderSportsPage();
+      startSportsCycle();
+    });
+  }
+
+  doFetch();
+  // Refresh every 2 minutes
+  sportsState.fetchTimer = setInterval(doFetch, 2 * 60 * 1000);
+}
+
 // ─── INIT ─────────────────────────────────────────────────────────────────────
-applyRotation();
+applyBottomBlock();
+if (prefs.bottomBlock === 'sports') {
+  initSports();
+}
 </script>
 </body>
 </html>
