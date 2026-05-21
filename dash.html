@@ -719,6 +719,24 @@
     text-transform: uppercase;
   }
 
+  .mlb-record {
+    font-family: 'Courier New', monospace;
+    font-size: 8px;
+    color: #666;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+  }
+
+  .mlb-start-time {
+    font-family: 'Courier New', monospace;
+    font-size: 9px;
+    color: #aaaaaa;
+    text-align: center;
+    letter-spacing: 0.06em;
+    margin-top: 2px;
+    font-weight: bold;
+  }
+
   /* ── NBA/NHL game tile ── */
   .nba-game, .nhl-game {
     -webkit-box-flex: 1;
@@ -1908,6 +1926,35 @@ function parseEspnScoreboard(league, data) {
     }
     if (!home || !away) continue;
 
+    // Win-loss records
+    var homeRec = '', awayRec = '';
+    var homeStats = home.records || [];
+    var awayStats = away.records || [];
+    for (var ri = 0; ri < homeStats.length; ri++) {
+      if (homeStats[ri].type === 'total' || homeStats[ri].name === 'overall') {
+        homeRec = homeStats[ri].summary || ''; break;
+      }
+    }
+    if (!homeRec && homeStats.length) homeRec = homeStats[0].summary || '';
+    for (var ri2 = 0; ri2 < awayStats.length; ri2++) {
+      if (awayStats[ri2].type === 'total' || awayStats[ri2].name === 'overall') {
+        awayRec = awayStats[ri2].summary || ''; break;
+      }
+    }
+    if (!awayRec && awayStats.length) awayRec = awayStats[0].summary || '';
+
+    // Start time — format as "7:05 PM" in local time
+    var startTimeStr = '';
+    if (ev.date) {
+      try {
+        var d = new Date(ev.date);
+        var hh = d.getHours(), mm = d.getMinutes();
+        var ap = hh >= 12 ? 'PM' : 'AM';
+        hh = hh % 12 || 12;
+        startTimeStr = hh + ':' + (mm < 10 ? '0' + mm : mm) + ' ' + ap;
+      } catch(e) {}
+    }
+
     var game = {
       id:        ev.id,
       state:     state,
@@ -1917,6 +1964,9 @@ function parseEspnScoreboard(league, data) {
       awayName:  away.team.shortDisplayName || away.team.name || '',
       homeScore: parseInt(home.score || '0', 10),
       awayScore: parseInt(away.score || '0', 10),
+      homeRecord: homeRec,
+      awayRecord: awayRec,
+      startTime:     startTimeStr,
       displayClock:  status.displayClock || '',
       period:        status.period || 0,
       statusDetail:  statusType.shortDetail || statusType.description || ''
@@ -1942,13 +1992,15 @@ function parseEspnScoreboard(league, data) {
 function renderMlbGame(game) {
   var homeWin = game.homeScore > game.awayScore;
   var awayWin = game.awayScore > game.homeScore;
+  var isPre  = game.state === 'pre';
+  var isIn   = game.state === 'in';
+  var isPost = game.state === 'post';
+
   var inningStr = '';
-  if (game.state === 'in') {
+  if (isIn) {
     inningStr = (game.inningHalf || '') + ' ' + ordinal(game.inning || game.period);
-  } else if (game.state === 'post') {
+  } else if (isPost) {
     inningStr = 'FINAL';
-  } else {
-    inningStr = 'UPCOMING';
   }
 
   var basesHtml = '<div class="mlb-bases">'
@@ -1966,22 +2018,47 @@ function renderMlbGame(game) {
   var homeColor = colorFor('mlb', game.homeAbbr);
   var awayColor = colorFor('mlb', game.awayAbbr);
 
+  // For upcoming: show abbr + record; hide score
+  // For live/final: show abbr + score
+  var awayRowHtml, homeRowHtml;
+  if (isPre) {
+    awayRowHtml = '<div class="mlb-team-row">'
+      + '<div class="mlb-abbr" style="color:' + teamTextColor(awayColor) + ';background:' + awayColor + ';border-radius:4px;padding:1px 3px;">' + game.awayAbbr + '</div>'
+      + (game.awayRecord ? '<div class="mlb-record">' + game.awayRecord + '</div>' : '')
+      + '</div>';
+    homeRowHtml = '<div class="mlb-team-row">'
+      + '<div class="mlb-abbr" style="color:' + teamTextColor(homeColor) + ';background:' + homeColor + ';border-radius:4px;padding:1px 3px;">' + game.homeAbbr + '</div>'
+      + (game.homeRecord ? '<div class="mlb-record">' + game.homeRecord + '</div>' : '')
+      + '</div>';
+  } else {
+    awayRowHtml = '<div class="mlb-team-row">'
+      + '<div class="mlb-abbr" style="color:' + teamTextColor(awayColor) + ';background:' + awayColor + ';border-radius:4px;padding:1px 3px;">' + game.awayAbbr + '</div>'
+      + '<div class="mlb-score' + (awayWin ? ' winning' : '') + '">' + game.awayScore + '</div>'
+      + '</div>';
+    homeRowHtml = '<div class="mlb-team-row">'
+      + '<div class="mlb-abbr" style="color:' + teamTextColor(homeColor) + ';background:' + homeColor + ';border-radius:4px;padding:1px 3px;">' + game.homeAbbr + '</div>'
+      + '<div class="mlb-score' + (homeWin ? ' winning' : '') + '">' + game.homeScore + '</div>'
+      + '</div>';
+  }
+
+  var metaHtml = '<div class="mlb-meta">';
+  if (isPre) {
+    metaHtml += '<div class="mlb-start-time">' + (game.startTime || 'TBD') + '</div>';
+  } else {
+    metaHtml += '<div class="mlb-inning">' + inningStr + '</div>';
+    if (isIn) {
+      metaHtml += basesHtml + outsHtml;
+    }
+  }
+  metaHtml += '</div>';
+
   return '<div class="mlb-game">'
     + '<div class="mlb-teams">'
-    + '<div class="mlb-team-row">'
-    + '<div class="mlb-abbr" style="color:' + teamTextColor(awayColor) + ';background:' + awayColor + ';border-radius:4px;padding:1px 3px;">' + game.awayAbbr + '</div>'
-    + '<div class="mlb-score' + (awayWin ? ' winning' : '') + '">' + game.awayScore + '</div>'
-    + '</div>'
+    + awayRowHtml
     + '<div class="mlb-divider"></div>'
-    + '<div class="mlb-team-row">'
-    + '<div class="mlb-abbr" style="color:' + teamTextColor(homeColor) + ';background:' + homeColor + ';border-radius:4px;padding:1px 3px;">' + game.homeAbbr + '</div>'
-    + '<div class="mlb-score' + (homeWin ? ' winning' : '') + '">' + game.homeScore + '</div>'
+    + homeRowHtml
     + '</div>'
-    + '</div>'
-    + '<div class="mlb-meta">'
-    + '<div class="mlb-inning">' + inningStr + '</div>'
-    + (game.state === 'in' ? basesHtml + outsHtml : '')
-    + '</div>'
+    + metaHtml
     + '</div>';
 }
 
