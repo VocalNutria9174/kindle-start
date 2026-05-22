@@ -203,14 +203,12 @@
     text-align: center;
   }
   /* ASCII-art weather icon — works on all renderers */
+  /* SVG weather icon */
   .weather-icon {
-    font-size: 22px;
-    line-height: 1;
+    width: 36px;
+    height: 36px;
     margin: 3px 0;
-    font-family: 'Courier New', monospace;
-    color: #ffffff;
-    text-align: center;
-    letter-spacing: -0.05em;
+    display: block;
   }
   .weather-temp {
     font-size: 26px;
@@ -1380,23 +1378,62 @@ buildCalendar();
 // ─── WEATHER ─────────────────────────────────────────────────────────────────
 var API_KEY = '0264a07ef00385ae3a6ea69858c85c52';
 
-// Text-based weather icons — emoji are unreliable on Kindle e-ink
-var weatherIcons = {
-  'Clear':        '☀️',
-  'Clouds':       '☁️',
-  'Rain':         '🌧️',
-  'Drizzle':      '🌦️',
-  'Thunderstorm': '⛈️',
-  'Snow':         '❄️',
-  'Mist':         '🌫️',
-  'Fog':          '🌫️',
-  'Haze':         '🌁',
-  'Smoke':        '🌫️',
-  'Dust':         '💨',
-  'Sand':         '💨',
-  'Ash':          '🌋',
-  'Squall':       '💨',
-  'Tornado':      '🌪️'
+// SVG-based weather icons — emoji and Unicode glyphs are unreliable on Kindle e-ink
+// Each returns a small inline SVG string with white strokes on transparent bg
+function makeWeatherIcon(type) {
+  var s = '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" style="display:block;margin:auto;">';
+  if (type === 'Clear') {
+    s += '<circle cx="18" cy="18" r="7" stroke="#fff" stroke-width="2" fill="none"/>';
+    var rays = [[18,2,18,7],[18,29,18,34],[2,18,7,18],[29,18,34,18],[6,6,9.5,9.5],[26.5,26.5,30,30],[30,6,26.5,9.5],[9.5,26.5,6,30]];
+    for (var ri=0;ri<rays.length;ri++){s+='<line x1="'+rays[ri][0]+'" y1="'+rays[ri][1]+'" x2="'+rays[ri][2]+'" y2="'+rays[ri][3]+'" stroke="#fff" stroke-width="2" stroke-linecap="round"/>';}
+  } else if (type === 'Clouds') {
+    s += '<path d="M8 24 Q8 19 13 19 Q13 14 18 14 Q24 14 24 19 Q28 19 28 24 Z" stroke="#fff" stroke-width="2" fill="none" stroke-linejoin="round"/>';
+  } else if (type === 'Rain') {
+    s += '<path d="M7 18 Q7 13 12 13 Q12 9 17 9 Q23 9 23 13 Q27 13 27 18 Z" stroke="#fff" stroke-width="2" fill="none" stroke-linejoin="round"/>';
+    s += '<line x1="11" y1="22" x2="9" y2="28" stroke="#fff" stroke-width="2" stroke-linecap="round"/>';
+    s += '<line x1="18" y1="22" x2="16" y2="28" stroke="#fff" stroke-width="2" stroke-linecap="round"/>';
+    s += '<line x1="25" y1="22" x2="23" y2="28" stroke="#fff" stroke-width="2" stroke-linecap="round"/>';
+  } else if (type === 'Drizzle') {
+    s += '<path d="M7 18 Q7 13 12 13 Q12 9 17 9 Q23 9 23 13 Q27 13 27 18 Z" stroke="#fff" stroke-width="2" fill="none" stroke-linejoin="round"/>';
+    s += '<line x1="13" y1="22" x2="12" y2="26" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>';
+    s += '<line x1="20" y1="22" x2="19" y2="26" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>';
+    s += '<line x1="16" y1="25" x2="15" y2="29" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>';
+  } else if (type === 'Thunderstorm') {
+    s += '<path d="M5 17 Q5 11 11 11 Q11 6 17 6 Q24 6 24 11 Q29 11 29 17 Z" stroke="#fff" stroke-width="2" fill="none" stroke-linejoin="round"/>';
+    s += '<polyline points="20,19 16,26 19,26 15,33" stroke="#fff" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round"/>';
+  } else if (type === 'Snow') {
+    s += '<line x1="18" y1="6" x2="18" y2="30" stroke="#fff" stroke-width="2" stroke-linecap="round"/>';
+    s += '<line x1="6" y1="18" x2="30" y2="18" stroke="#fff" stroke-width="2" stroke-linecap="round"/>';
+    s += '<line x1="9.5" y1="9.5" x2="26.5" y2="26.5" stroke="#fff" stroke-width="2" stroke-linecap="round"/>';
+    s += '<line x1="26.5" y1="9.5" x2="9.5" y2="26.5" stroke="#fff" stroke-width="2" stroke-linecap="round"/>';
+    s += '<circle cx="18" cy="18" r="2.5" fill="#fff"/>';
+  } else if (type === 'Mist' || type === 'Fog' || type === 'Haze' || type === 'Smoke') {
+    s += '<line x1="6" y1="12" x2="30" y2="12" stroke="#fff" stroke-width="2" stroke-linecap="round"/>';
+    s += '<line x1="9" y1="18" x2="27" y2="18" stroke="#fff" stroke-width="2" stroke-linecap="round"/>';
+    s += '<line x1="6" y1="24" x2="30" y2="24" stroke="#fff" stroke-width="2" stroke-linecap="round"/>';
+  } else if (type === 'Tornado') {
+    s += '<path d="M8 8 Q18 10 28 8" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>';
+    s += '<path d="M10 14 Q18 16 26 14" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>';
+    s += '<path d="M13 20 Q18 22 23 20" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>';
+    s += '<path d="M15 26 Q18 28 21 26" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>';
+    s += '<line x1="18" y1="28" x2="18" y2="33" stroke="#fff" stroke-width="2" stroke-linecap="round"/>';
+  } else {
+    // Default: thermometer
+    s += '<line x1="18" y1="6" x2="18" y2="22" stroke="#fff" stroke-width="3" stroke-linecap="round"/>';
+    s += '<circle cx="18" cy="26" r="4" stroke="#fff" stroke-width="2" fill="none"/>';
+    s += '<line x1="18" y1="11" x2="22" y2="11" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>';
+    s += '<line x1="18" y1="15" x2="22" y2="15" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>';
+    s += '<line x1="18" y1="19" x2="22" y2="19" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>';
+  }
+  s += '</svg>';
+  return s;
+}
+
+var weatherIconTypes = {
+  'Clear': 'Clear', 'Clouds': 'Clouds', 'Rain': 'Rain', 'Drizzle': 'Drizzle',
+  'Thunderstorm': 'Thunderstorm', 'Snow': 'Snow', 'Mist': 'Mist', 'Fog': 'Fog',
+  'Haze': 'Haze', 'Smoke': 'Smoke', 'Dust': 'default', 'Sand': 'default',
+  'Ash': 'default', 'Squall': 'default', 'Tornado': 'Tornado'
 };
 
 function fetchWeather() {
@@ -1426,7 +1463,8 @@ function fetchWeather() {
         var humidity = data.main.humidity;
         var windSpeed = Math.round(data.wind.speed);
         var wind = unit === 'imperial' ? (windSpeed + ' mph') : (windSpeed + ' m/s');
-        var icon = weatherIcons[main] || '🌡️';
+        var iconType = weatherIconTypes[main] || 'default';
+        var icon = makeWeatherIcon(iconType);
         card.innerHTML =
           '<div class="weather-city">' + data.name.toUpperCase() + '</div>' +
           '<div class="weather-icon">' + icon + '</div>' +
@@ -1456,9 +1494,9 @@ fetchWeather();
 setInterval(fetchWeather, 10 * 60 * 1000);
 
 // ─── STOCKS ───────────────────────────────────────────────────────────────────
-var STOCK_SYMBOLS = ['^GSPC', '^DJI', '^IXIC', 'AAPL', 'TSLA', 'NVDA'];
+var STOCK_SYMBOLS = ['^GSPC', '^DJI', '^IXIC', 'AAPL', 'NVDA'];
 var STOCK_LABELS  = { '^GSPC': 'S&P 500', '^DJI': 'DOW', '^IXIC': 'NASDAQ',
-                      'AAPL': 'AAPL', 'TSLA': 'TSLA', 'NVDA': 'NVDA' };
+                      'AAPL': 'AAPL', 'NVDA': 'NVDA' };
 
 // Parse Yahoo Finance JSON — handles both v8 chart and quote endpoints
 function parseYahooJson(text) {
