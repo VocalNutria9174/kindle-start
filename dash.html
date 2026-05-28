@@ -1981,15 +1981,22 @@ function parseEspnScoreboard(league, data) {
     }
     if (!awayRec && awayStats.length) awayRec = awayStats[0].summary || '';
 
-    // Start time — format as "7:05 PM" in local time
+    // Start time — format as "7:05 PM" in device local time
     var startTimeStr = '';
     if (ev.date) {
       try {
-        var d = new Date(ev.date);
-        var hh = d.getHours(), mm = d.getMinutes();
-        var ap = hh >= 12 ? 'PM' : 'AM';
-        hh = hh % 12 || 12;
-        startTimeStr = hh + ':' + (mm < 10 ? '0' + mm : mm) + ' ' + ap;
+        // new Date() parses ISO strings as UTC; getHours() returns local time.
+        // On older WebKit (Kindle), ensure the string is a valid ISO-8601 format.
+        var dateStr = ev.date;
+        // Normalize: if no trailing Z or offset, assume UTC
+        if (!/Z$|[+-]\d{2}:\d{2}$/.test(dateStr)) { dateStr += 'Z'; }
+        var d = new Date(dateStr);
+        if (!isNaN(d.getTime())) {
+          var hh = d.getHours(), mm = d.getMinutes();
+          var ap = hh >= 12 ? 'PM' : 'AM';
+          hh = hh % 12 || 12;
+          startTimeStr = hh + ':' + (mm < 10 ? '0' + mm : mm) + ' ' + ap;
+        }
       } catch(e) {}
     }
 
@@ -2014,7 +2021,21 @@ function parseEspnScoreboard(league, data) {
     if (league === 'mlb') {
       var sit = comps.situation || {};
       game.inning    = sit.period || game.period;
-      game.inningHalf = (sit.isTopInning !== undefined ? (sit.isTopInning ? 'TOP' : 'BOT') : '');
+
+      // Determine inning half: prefer live situation flag, fall back to statusDetail text
+      var inningHalf = '';
+      if (sit.isTopInning !== undefined) {
+        inningHalf = sit.isTopInning ? 'TOP' : 'BOT';
+      } else if (game.state === 'in' && statusType.shortDetail) {
+        // ESPN shortDetail for live MLB is e.g. "Top 3rd" / "Bot 5th" / "Mid 7th" / "End 9th"
+        var detailLower = statusType.shortDetail.toLowerCase();
+        if (/^top/.test(detailLower))      { inningHalf = 'TOP'; }
+        else if (/^bot/.test(detailLower)) { inningHalf = 'BOT'; }
+        else if (/^mid/.test(detailLower)) { inningHalf = 'MID'; }
+        else if (/^end/.test(detailLower)) { inningHalf = 'END'; }
+      }
+      game.inningHalf = inningHalf;
+
       game.outs      = sit.outs || 0;
       game.onFirst   = !!(sit.onFirst);
       game.onSecond  = !!(sit.onSecond);
