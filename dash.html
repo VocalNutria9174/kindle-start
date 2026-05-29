@@ -1012,6 +1012,283 @@
   }
   .settings-row > * { -webkit-box-flex: 1; -webkit-flex: 1; flex: 1; }
 
+  /* ============ WEATHER FORECAST PANEL ============ */
+  .wxforecast-card {
+    width: 100%;
+    border-radius: 18px;
+    background: #1a1a1a;
+    padding: 14px 16px;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 120px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .wxforecast-header {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-box-pack: justify;
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .wxforecast-title {
+    font-family: 'Courier New', monospace;
+    font-size: 8px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #555555;
+  }
+
+  .wxforecast-city {
+    font-family: 'Courier New', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #e05555;
+    font-weight: bold;
+  }
+
+  /* Tab strip: 7-day / Hourly */
+  .wxforecast-tabs {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    gap: 4px;
+  }
+
+  .wxforecast-tab {
+    font-family: 'Courier New', monospace;
+    font-size: 8px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 7px;
+    border-radius: 6px;
+    color: #555;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    -webkit-appearance: none;
+    appearance: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .wxforecast-tab.active {
+    background: #e05555;
+    color: #fff;
+  }
+
+  /* Row of day/hour tiles */
+  .wxforecast-row {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+    gap: 6px;
+    width: 100%;
+    -webkit-flex-wrap: nowrap;
+    flex-wrap: nowrap;
+  }
+
+  .wxforecast-tile {
+    -webkit-box-flex: 1;
+    -webkit-flex: 1 1 0;
+    flex: 1 1 0;
+    background: #222222;
+    border-radius: 10px;
+    padding: 7px 4px;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+    gap: 3px;
+    min-width: 0;
+  }
+
+  .wxforecast-label {
+    font-family: 'Courier New', monospace;
+    font-size: 8px;
+    color: #888888;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .wxforecast-icon {
+    width: 22px;
+    height: 22px;
+    display: block;
+  }
+
+  .wxforecast-temp-hi {
+    font-family: Georgia, serif;
+    font-size: 12px;
+    font-weight: bold;
+    color: #ffffff;
+    letter-spacing: -0.01em;
+  }
+
+  .wxforecast-temp-lo {
+    font-family: 'Courier New', monospace;
+    font-size: 9px;
+    color: #666666;
+    letter-spacing: 0.02em;
+  }
+
+  .wxforecast-desc {
+    font-family: 'Courier New', monospace;
+    font-size: 7px;
+    color: #666666;
+    text-align: center;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+  }
+
+  .wxforecast-pop {
+    font-family: 'Courier New', monospace;
+    font-size: 7px;
+    color: #5599cc;
+    letter-spacing: 0.02em;
+  }
+
+  .wxforecast-status {
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    color: #555;
+    text-align: center;
+    padding: 8px 0;
+    letter-spacing: 0.05em;
+  }
+
+  /* ============ WORLD CLOCKS PANEL ============ */
+  .worldclock-card {
+    width: 100%;
+    border-radius: 18px;
+    background: #1a1a1a;
+    padding: 14px 16px;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 120px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .worldclock-header {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+    width: 100%;
+  }
+
+  .worldclock-title {
+    font-family: 'Courier New', monospace;
+    font-size: 8px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #555555;
+  }
+
+  .worldclock-row {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .worldclock-tile {
+    -webkit-box-flex: 1;
+    -webkit-flex: 1 1 0;
+    flex: 1 1 0;
+    background: #222222;
+    border-radius: 10px;
+    padding: 10px 8px;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+    gap: 3px;
+    min-width: 0;
+  }
+
+  .worldclock-city {
+    font-family: 'Courier New', monospace;
+    font-size: 8px;
+    color: #888888;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+  }
+
+  .worldclock-time {
+    font-family: Georgia, serif;
+    font-size: 18px;
+    font-weight: bold;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .worldclock-ampm {
+    font-family: 'Courier New', monospace;
+    font-size: 9px;
+    color: #e05555;
+    letter-spacing: 0.08em;
+    text-align: center;
+  }
+
+  .worldclock-date {
+    font-family: 'Courier New', monospace;
+    font-size: 7px;
+    color: #555555;
+    letter-spacing: 0.04em;
+    text-align: center;
+  }
+
+  .worldclock-offset {
+    font-family: 'Courier New', monospace;
+    font-size: 7px;
+    color: #444444;
+    letter-spacing: 0.03em;
+    text-align: center;
+  }
+
 </style>
 </head>
 <body>
@@ -1088,6 +1365,30 @@
           <div class="sports-status">Loading scores...</div>
         </div>
         <div class="sports-progress" id="sportsProgress"></div>
+      </div>
+
+      <!-- WEATHER FORECAST CARD (hidden by default) -->
+      <div id="wxforecastCard" class="wxforecast-card" style="display:none;">
+        <div class="wxforecast-header">
+          <div class="wxforecast-title">Forecast</div>
+          <div class="wxforecast-city" id="wxforecastCity"></div>
+          <div class="wxforecast-tabs">
+            <button class="wxforecast-tab active" id="wxTab7day" onclick="switchWxTab('7day')">7-DAY</button>
+            <button class="wxforecast-tab" id="wxTabHourly" onclick="switchWxTab('hourly')">HOURLY</button>
+          </div>
+        </div>
+        <div id="wxforecastBody">
+          <div class="wxforecast-status">Loading forecast...</div>
+        </div>
+      </div>
+
+      <!-- WORLD CLOCKS CARD (hidden by default) -->
+      <div id="worldclockCard" class="worldclock-card" style="display:none;">
+        <div class="worldclock-header">
+          <div class="worldclock-title">World Clocks</div>
+        </div>
+        <div class="worldclock-row" id="worldclockRow">
+        </div>
       </div>
 
       <!-- Settings bar (in-flow, not fixed) -->
@@ -1168,6 +1469,8 @@
         <select id="settingBottomBlock" onchange="onBottomBlockChange()">
           <option value="news">News</option>
           <option value="sports">Sports Scores</option>
+          <option value="wxforecast">Weather Forecast</option>
+          <option value="worldclock">World Clocks</option>
         </select>
       </div>
 
@@ -1178,6 +1481,85 @@
           <option value="nba">NBA — Basketball</option>
           <option value="nhl">NHL — Hockey</option>
         </select>
+      </div>
+
+      <div id="settingWxForecastRow" style="display:none;">
+        <label>Forecast Type</label>
+        <select id="settingWxForecastType">
+          <option value="7day">7-Day Daily</option>
+          <option value="hourly">Hourly (Next 24 hrs)</option>
+        </select>
+      </div>
+
+      <div id="settingWorldClockRow" style="display:none;">
+        <label>Clock 1 — Label &amp; UTC Offset</label>
+        <div class="settings-row">
+          <input type="text" id="settingWc1Label" placeholder="New York" style="-webkit-flex:2;flex:2;" />
+          <select id="settingWc1Offset" style="-webkit-flex:1;flex:1;">
+            <option value="-12">−12</option><option value="-11">−11</option><option value="-10">−10</option>
+            <option value="-9">−9</option><option value="-8">−8</option><option value="-7">−7</option>
+            <option value="-6">−6</option><option value="-5">−5</option><option value="-4">−4</option>
+            <option value="-3">−3</option><option value="-2">−2</option><option value="-1">−1</option>
+            <option value="0">UTC</option>
+            <option value="1">+1</option><option value="2">+2</option><option value="3">+3</option>
+            <option value="3.5">+3:30</option><option value="4">+4</option><option value="4.5">+4:30</option>
+            <option value="5">+5</option><option value="5.5">+5:30</option><option value="5.75">+5:45</option>
+            <option value="6">+6</option><option value="6.5">+6:30</option><option value="7">+7</option>
+            <option value="8">+8</option><option value="9">+9</option><option value="9.5">+9:30</option>
+            <option value="10">+10</option><option value="11">+11</option><option value="12">+12</option>
+          </select>
+        </div>
+        <label style="margin-top:8px;">Clock 2 — Label &amp; UTC Offset</label>
+        <div class="settings-row">
+          <input type="text" id="settingWc2Label" placeholder="London" style="-webkit-flex:2;flex:2;" />
+          <select id="settingWc2Offset" style="-webkit-flex:1;flex:1;">
+            <option value="-12">−12</option><option value="-11">−11</option><option value="-10">−10</option>
+            <option value="-9">−9</option><option value="-8">−8</option><option value="-7">−7</option>
+            <option value="-6">−6</option><option value="-5">−5</option><option value="-4">−4</option>
+            <option value="-3">−3</option><option value="-2">−2</option><option value="-1">−1</option>
+            <option value="0">UTC</option>
+            <option value="1">+1</option><option value="2">+2</option><option value="3">+3</option>
+            <option value="3.5">+3:30</option><option value="4">+4</option><option value="4.5">+4:30</option>
+            <option value="5">+5</option><option value="5.5">+5:30</option><option value="5.75">+5:45</option>
+            <option value="6">+6</option><option value="6.5">+6:30</option><option value="7">+7</option>
+            <option value="8">+8</option><option value="9">+9</option><option value="9.5">+9:30</option>
+            <option value="10">+10</option><option value="11">+11</option><option value="12">+12</option>
+          </select>
+        </div>
+        <label style="margin-top:8px;">Clock 3 — Label &amp; UTC Offset</label>
+        <div class="settings-row">
+          <input type="text" id="settingWc3Label" placeholder="Tokyo" style="-webkit-flex:2;flex:2;" />
+          <select id="settingWc3Offset" style="-webkit-flex:1;flex:1;">
+            <option value="-12">−12</option><option value="-11">−11</option><option value="-10">−10</option>
+            <option value="-9">−9</option><option value="-8">−8</option><option value="-7">−7</option>
+            <option value="-6">−6</option><option value="-5">−5</option><option value="-4">−4</option>
+            <option value="-3">−3</option><option value="-2">−2</option><option value="-1">−1</option>
+            <option value="0">UTC</option>
+            <option value="1">+1</option><option value="2">+2</option><option value="3">+3</option>
+            <option value="3.5">+3:30</option><option value="4">+4</option><option value="4.5">+4:30</option>
+            <option value="5">+5</option><option value="5.5">+5:30</option><option value="5.75">+5:45</option>
+            <option value="6">+6</option><option value="6.5">+6:30</option><option value="7">+7</option>
+            <option value="8">+8</option><option value="9">+9</option><option value="9.5">+9:30</option>
+            <option value="10">+10</option><option value="11">+11</option><option value="12">+12</option>
+          </select>
+        </div>
+        <label style="margin-top:8px;">Clock 4 — Label &amp; UTC Offset (optional)</label>
+        <div class="settings-row">
+          <input type="text" id="settingWc4Label" placeholder="Sydney (or leave blank)" style="-webkit-flex:2;flex:2;" />
+          <select id="settingWc4Offset" style="-webkit-flex:1;flex:1;">
+            <option value="-12">−12</option><option value="-11">−11</option><option value="-10">−10</option>
+            <option value="-9">−9</option><option value="-8">−8</option><option value="-7">−7</option>
+            <option value="-6">−6</option><option value="-5">−5</option><option value="-4">−4</option>
+            <option value="-3">−3</option><option value="-2">−2</option><option value="-1">−1</option>
+            <option value="0">UTC</option>
+            <option value="1">+1</option><option value="2">+2</option><option value="3">+3</option>
+            <option value="3.5">+3:30</option><option value="4">+4</option><option value="4.5">+4:30</option>
+            <option value="5">+5</option><option value="5.5">+5:30</option><option value="5.75">+5:45</option>
+            <option value="6">+6</option><option value="6.5">+6:30</option><option value="7">+7</option>
+            <option value="8">+8</option><option value="9">+9</option><option value="9.5">+9:30</option>
+            <option value="10">+10</option><option value="11">+11</option><option value="12">+12</option>
+          </select>
+        </div>
       </div>
 
       <br>
