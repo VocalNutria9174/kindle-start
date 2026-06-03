@@ -1614,11 +1614,22 @@ if (!prefs.rotation)          prefs.rotation    = '0';
 if (prefs.tzOffset === undefined) prefs.tzOffset = -5;
 if (!prefs.bottomBlock)       prefs.bottomBlock = 'news';
 if (!prefs.sport)             prefs.sport       = 'mlb';
+if (!prefs.wxForecastType)    prefs.wxForecastType = '7day';
+if (!prefs.wc1Label)          prefs.wc1Label    = 'New York';
+if (prefs.wc1Offset === undefined) prefs.wc1Offset = -5;
+if (!prefs.wc2Label)          prefs.wc2Label    = 'London';
+if (prefs.wc2Offset === undefined) prefs.wc2Offset = 0;
+if (!prefs.wc3Label)          prefs.wc3Label    = 'Tokyo';
+if (prefs.wc3Offset === undefined) prefs.wc3Offset = 9;
+if (!prefs.wc4Label)          prefs.wc4Label    = 'Sydney';
+if (prefs.wc4Offset === undefined) prefs.wc4Offset = 10;
 
 // ─── SETTINGS UI ─────────────────────────────────────────────────────────────
 function onBottomBlockChange() {
   var val = document.getElementById('settingBottomBlock').value;
-  document.getElementById('settingSportRow').style.display = val === 'sports' ? 'block' : 'none';
+  document.getElementById('settingSportRow').style.display       = (val === 'sports')     ? 'block' : 'none';
+  document.getElementById('settingWxForecastRow').style.display  = (val === 'wxforecast') ? 'block' : 'none';
+  document.getElementById('settingWorldClockRow').style.display  = (val === 'worldclock') ? 'block' : 'none';
 }
 
 function openSettings() {
@@ -1628,6 +1639,15 @@ function openSettings() {
   document.getElementById('settingTimezone').value   = String(prefs.tzOffset);
   document.getElementById('settingBottomBlock').value = prefs.bottomBlock;
   document.getElementById('settingSport').value       = prefs.sport;
+  document.getElementById('settingWxForecastType').value = prefs.wxForecastType;
+  document.getElementById('settingWc1Label').value   = prefs.wc1Label;
+  document.getElementById('settingWc1Offset').value  = String(prefs.wc1Offset);
+  document.getElementById('settingWc2Label').value   = prefs.wc2Label;
+  document.getElementById('settingWc2Offset').value  = String(prefs.wc2Offset);
+  document.getElementById('settingWc3Label').value   = prefs.wc3Label;
+  document.getElementById('settingWc3Offset').value  = String(prefs.wc3Offset);
+  document.getElementById('settingWc4Label').value   = prefs.wc4Label;
+  document.getElementById('settingWc4Offset').value  = String(prefs.wc4Offset);
   onBottomBlockChange();
   document.getElementById('settingsPanel').className = 'settings-panel open';
 }
@@ -1643,6 +1663,15 @@ function saveSettings() {
   prefs.tzOffset    = parseFloat(document.getElementById('settingTimezone').value);
   prefs.bottomBlock = document.getElementById('settingBottomBlock').value;
   prefs.sport       = document.getElementById('settingSport').value;
+  prefs.wxForecastType = document.getElementById('settingWxForecastType').value;
+  prefs.wc1Label    = document.getElementById('settingWc1Label').value || 'New York';
+  prefs.wc1Offset   = parseFloat(document.getElementById('settingWc1Offset').value);
+  prefs.wc2Label    = document.getElementById('settingWc2Label').value || 'London';
+  prefs.wc2Offset   = parseFloat(document.getElementById('settingWc2Offset').value);
+  prefs.wc3Label    = document.getElementById('settingWc3Label').value || 'Tokyo';
+  prefs.wc3Offset   = parseFloat(document.getElementById('settingWc3Offset').value);
+  prefs.wc4Label    = document.getElementById('settingWc4Label').value;
+  prefs.wc4Offset   = parseFloat(document.getElementById('settingWc4Offset').value);
   savePrefs(prefs);
   closeSettings();
   applyRotation();
@@ -1651,6 +1680,13 @@ function saveSettings() {
   applyBottomBlock();
   if (prefs.bottomBlock === 'sports' && (oldBlock !== 'sports' || oldSport !== prefs.sport)) {
     initSports();
+  }
+  if (prefs.bottomBlock === 'wxforecast') {
+    wxForecastCache = {};
+    fetchWxForecast();
+  }
+  if (prefs.bottomBlock === 'worldclock') {
+    buildWorldClockTiles();
   }
 }
 
@@ -2210,14 +2246,22 @@ setInterval(function() { newsCache = {}; }, 60 * 60 * 1000);
 
 // ─── BOTTOM BLOCK SWITCHER ────────────────────────────────────────────────────
 function applyBottomBlock() {
-  var newsCard   = document.getElementById('newsCard');
-  var sportsCard = document.getElementById('sportsCard');
+  var newsCard        = document.getElementById('newsCard');
+  var sportsCard      = document.getElementById('sportsCard');
+  var wxforecastCard  = document.getElementById('wxforecastCard');
+  var worldclockCard  = document.getElementById('worldclockCard');
+  newsCard.style.display       = 'none';
+  sportsCard.style.display     = 'none';
+  wxforecastCard.style.display = 'none';
+  worldclockCard.style.display = 'none';
   if (prefs.bottomBlock === 'sports') {
-    newsCard.style.display   = 'none';
     sportsCard.style.display = '';
+  } else if (prefs.bottomBlock === 'wxforecast') {
+    wxforecastCard.style.display = '';
+  } else if (prefs.bottomBlock === 'worldclock') {
+    worldclockCard.style.display = '';
   } else {
-    newsCard.style.display   = '';
-    sportsCard.style.display = 'none';
+    newsCard.style.display = '';
   }
 }
 
@@ -2672,10 +2716,291 @@ function initSports() {
   sportsState.fetchTimer = setInterval(doFetch, 2 * 60 * 1000);
 }
 
+// ─── WEATHER FORECAST ENGINE ─────────────────────────────────────────────────
+// Uses OpenWeatherMap /forecast (3-hr intervals, free tier) for hourly view,
+// and condenses the same data into daily hi/lo buckets for the 7-day view.
+// The free /forecast endpoint gives 40 × 3-hr slots = 5 days; we show up to 7
+// labels but cap at what the API returns (~5 days on free tier).
+
+var wxForecastCache = {};   // keyed by city+unit+type
+var wxForecastTab   = prefs.wxForecastType || '7day';
+
+function switchWxTab(tab) {
+  wxForecastTab = tab;
+  document.getElementById('wxTab7day').className  = 'wxforecast-tab' + (tab === '7day'   ? ' active' : '');
+  document.getElementById('wxTabHourly').className = 'wxforecast-tab' + (tab === 'hourly' ? ' active' : '');
+  renderWxForecast();
+}
+
+// Small inline SVG icon sized 22×22 for forecast tiles (reuses makeWeatherIcon logic at smaller size)
+function makeWxSmallIcon(type) {
+  var s = '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 36 36" style="display:block;">';
+  if (type === 'Clear') {
+    s += '<circle cx="18" cy="18" r="7" stroke="#ccc" stroke-width="2" fill="none"/>';
+    var rays = [[18,2,18,7],[18,29,18,34],[2,18,7,18],[29,18,34,18],[6,6,9.5,9.5],[26.5,26.5,30,30],[30,6,26.5,9.5],[9.5,26.5,6,30]];
+    for (var ri=0;ri<rays.length;ri++){s+='<line x1="'+rays[ri][0]+'" y1="'+rays[ri][1]+'" x2="'+rays[ri][2]+'" y2="'+rays[ri][3]+'" stroke="#ccc" stroke-width="2" stroke-linecap="round"/>';}
+  } else if (type === 'Clouds') {
+    s += '<path d="M8 24 Q8 19 13 19 Q13 14 18 14 Q24 14 24 19 Q28 19 28 24 Z" stroke="#ccc" stroke-width="2" fill="none" stroke-linejoin="round"/>';
+  } else if (type === 'Rain' || type === 'Drizzle') {
+    s += '<path d="M7 18 Q7 13 12 13 Q12 9 17 9 Q23 9 23 13 Q27 13 27 18 Z" stroke="#ccc" stroke-width="2" fill="none" stroke-linejoin="round"/>';
+    s += '<line x1="11" y1="22" x2="9" y2="28" stroke="#5599cc" stroke-width="2" stroke-linecap="round"/>';
+    s += '<line x1="18" y1="22" x2="16" y2="28" stroke="#5599cc" stroke-width="2" stroke-linecap="round"/>';
+    s += '<line x1="25" y1="22" x2="23" y2="28" stroke="#5599cc" stroke-width="2" stroke-linecap="round"/>';
+  } else if (type === 'Thunderstorm') {
+    s += '<path d="M5 17 Q5 11 11 11 Q11 6 17 6 Q24 6 24 11 Q29 11 29 17 Z" stroke="#ccc" stroke-width="2" fill="none" stroke-linejoin="round"/>';
+    s += '<polyline points="20,19 16,26 19,26 15,33" stroke="#e05555" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round"/>';
+  } else if (type === 'Snow') {
+    s += '<line x1="18" y1="6" x2="18" y2="30" stroke="#ccc" stroke-width="2" stroke-linecap="round"/>';
+    s += '<line x1="6" y1="18" x2="30" y2="18" stroke="#ccc" stroke-width="2" stroke-linecap="round"/>';
+    s += '<line x1="9.5" y1="9.5" x2="26.5" y2="26.5" stroke="#ccc" stroke-width="2" stroke-linecap="round"/>';
+    s += '<line x1="26.5" y1="9.5" x2="9.5" y2="26.5" stroke="#ccc" stroke-width="2" stroke-linecap="round"/>';
+  } else if (type === 'Mist' || type === 'Fog' || type === 'Haze') {
+    s += '<line x1="6" y1="12" x2="30" y2="12" stroke="#ccc" stroke-width="2" stroke-linecap="round"/>';
+    s += '<line x1="9" y1="18" x2="27" y2="18" stroke="#ccc" stroke-width="2" stroke-linecap="round"/>';
+    s += '<line x1="6" y1="24" x2="30" y2="24" stroke="#ccc" stroke-width="2" stroke-linecap="round"/>';
+  } else {
+    // Default cloud
+    s += '<path d="M8 24 Q8 19 13 19 Q13 14 18 14 Q24 14 24 19 Q28 19 28 24 Z" stroke="#ccc" stroke-width="2" fill="none" stroke-linejoin="round"/>';
+  }
+  s += '</svg>';
+  return s;
+}
+
+function fetchWxForecast() {
+  var body = document.getElementById('wxforecastBody');
+  var cityEl = document.getElementById('wxforecastCity');
+  if (!body) return;
+  body.innerHTML = '<div class="wxforecast-status">Loading forecast...</div>';
+  if (cityEl) cityEl.textContent = prefs.city.toUpperCase();
+
+  var cacheKey = prefs.city + '|' + prefs.unit;
+  if (wxForecastCache[cacheKey]) {
+    renderWxForecast();
+    return;
+  }
+
+  var url = 'https://api.openweathermap.org/data/2.5/forecast?q='
+    + encodeURIComponent(prefs.city)
+    + '&appid=' + API_KEY
+    + '&units=' + prefs.unit
+    + '&cnt=40';
+
+  var proxied = 'https://api.allorigins.win/get?url=' + encodeURIComponent(url);
+
+  function handleData(text) {
+    try {
+      var data = JSON.parse(text);
+      if (data && data.contents) { handleData(data.contents); return; }
+      if (!data.list || !data.list.length) throw new Error('no list');
+      wxForecastCache[cacheKey] = data.list;
+      renderWxForecast();
+    } catch(e) {
+      if (body) body.innerHTML = '<div class="wxforecast-status">Forecast unavailable</div>';
+    }
+  }
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', proxied, true);
+  xhr.timeout = 15000;
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState !== 4) return;
+    if (xhr.status === 200) {
+      handleData(xhr.responseText);
+    } else {
+      // Try direct
+      var xhr2 = new XMLHttpRequest();
+      xhr2.open('GET', url, true);
+      xhr2.timeout = 12000;
+      xhr2.onreadystatechange = function() {
+        if (xhr2.readyState !== 4) return;
+        if (xhr2.status === 200) { handleData(xhr2.responseText); }
+        else if (body) { body.innerHTML = '<div class="wxforecast-status">Forecast unavailable</div>'; }
+      };
+      xhr2.ontimeout = function() { if (body) body.innerHTML = '<div class="wxforecast-status">Timed out</div>'; };
+      xhr2.onerror   = function() { if (body) body.innerHTML = '<div class="wxforecast-status">Network error</div>'; };
+      xhr2.send();
+    }
+  };
+  xhr.ontimeout = function() { if (body) body.innerHTML = '<div class="wxforecast-status">Timed out</div>'; };
+  xhr.onerror   = function() { if (body) body.innerHTML = '<div class="wxforecast-status">Network error</div>'; };
+  xhr.send();
+}
+
+function renderWxForecast() {
+  var body = document.getElementById('wxforecastBody');
+  if (!body) return;
+  var cacheKey = prefs.city + '|' + prefs.unit;
+  var list = wxForecastCache[cacheKey];
+  if (!list) { fetchWxForecast(); return; }
+
+  var unitSymbol = prefs.unit === 'imperial' ? 'F' : 'C';
+  var html = '<div class="wxforecast-row">';
+
+  if (wxForecastTab === 'hourly') {
+    // Show next 8 slots (= 24 hrs at 3-hr intervals)
+    var slots = Math.min(8, list.length);
+    for (var i = 0; i < slots; i++) {
+      var slot = list[i];
+      var dt = new Date(slot.dt * 1000);
+      var hh = dt.getHours(), ap = hh >= 12 ? 'P' : 'A';
+      hh = hh % 12 || 12;
+      var main = slot.weather && slot.weather[0] ? slot.weather[0].main : 'Clouds';
+      var iconType = weatherIconTypes[main] || 'default';
+      var temp = Math.round(slot.main.temp);
+      var pop  = slot.pop !== undefined ? Math.round(slot.pop * 100) : 0;
+      html += '<div class="wxforecast-tile">'
+        + '<div class="wxforecast-label">' + hh + ap + '</div>'
+        + '<div class="wxforecast-icon">' + makeWxSmallIcon(iconType) + '</div>'
+        + '<div class="wxforecast-temp-hi">' + temp + '&deg;' + unitSymbol + '</div>'
+        + (pop > 0 ? '<div class="wxforecast-pop">' + pop + '%</div>' : '')
+        + '</div>';
+    }
+  } else {
+    // Build daily buckets from 3-hr slots
+    var days = {};
+    var dayOrder = [];
+    var dayNames = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+    for (var k = 0; k < list.length; k++) {
+      var slot = list[k];
+      var dt = new Date(slot.dt * 1000);
+      var dayKey = dt.getFullYear() + '-' + dt.getMonth() + '-' + dt.getDate();
+      if (!days[dayKey]) {
+        days[dayKey] = { label: dayNames[dt.getDay()], hi: -999, lo: 999, mains: [], pop: 0 };
+        dayOrder.push(dayKey);
+      }
+      var t = slot.main.temp;
+      if (t > days[dayKey].hi) days[dayKey].hi = t;
+      if (t < days[dayKey].lo) days[dayKey].lo = t;
+      if (slot.weather && slot.weather[0]) days[dayKey].mains.push(slot.weather[0].main);
+      if (slot.pop !== undefined && slot.pop > days[dayKey].pop) days[dayKey].pop = slot.pop;
+    }
+    var showDays = Math.min(7, dayOrder.length);
+    for (var di = 0; di < showDays; di++) {
+      var dk   = dayOrder[di];
+      var day  = days[dk];
+      // Pick most common weather condition for the icon
+      var mainCount = {};
+      for (var m = 0; m < day.mains.length; m++) {
+        var mn = day.mains[m];
+        mainCount[mn] = (mainCount[mn] || 0) + 1;
+      }
+      var topMain = 'Clouds', topCt = 0;
+      for (var mn in mainCount) {
+        if (mainCount[mn] > topCt) { topMain = mn; topCt = mainCount[mn]; }
+      }
+      var iconType = weatherIconTypes[topMain] || 'default';
+      var pop = Math.round(day.pop * 100);
+      html += '<div class="wxforecast-tile">'
+        + '<div class="wxforecast-label">' + day.label + '</div>'
+        + '<div class="wxforecast-icon">' + makeWxSmallIcon(iconType) + '</div>'
+        + '<div class="wxforecast-temp-hi">' + Math.round(day.hi) + '&deg;</div>'
+        + '<div class="wxforecast-temp-lo">' + Math.round(day.lo) + '&deg;</div>'
+        + (pop > 0 ? '<div class="wxforecast-pop">' + pop + '%</div>' : '')
+        + '</div>';
+    }
+  }
+
+  html += '</div>';
+  body.innerHTML = html;
+}
+
+// Refresh forecast every 30 minutes
+setInterval(function() {
+  wxForecastCache = {};
+  if (prefs.bottomBlock === 'wxforecast') fetchWxForecast();
+}, 30 * 60 * 1000);
+
+// ─── WORLD CLOCKS ENGINE ──────────────────────────────────────────────────────
+// Renders 3–4 configurable city clocks, ticking every second.
+// No network requests needed — all time math is local.
+
+var worldClockInterval = null;
+
+function getTimeForOffset(offset) {
+  var now = new Date();
+  var utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
+  return new Date(utcMs + offset * 3600000);
+}
+
+function fmtWcTime(d) {
+  var h = d.getHours(), m = d.getMinutes();
+  var ap = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  return h + ':' + (m < 10 ? '0' + m : m);
+}
+
+function fmtWcDate(d) {
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var days   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  return days[d.getDay()] + ' ' + months[d.getMonth()] + ' ' + d.getDate();
+}
+
+function fmtOffset(off) {
+  var sign = off >= 0 ? '+' : '-';
+  var abs  = Math.abs(off);
+  var h    = Math.floor(abs);
+  var m    = Math.round((abs - h) * 60);
+  return 'UTC' + sign + h + (m ? ':' + (m < 10 ? '0' + m : m) : '');
+}
+
+function buildWorldClockTiles() {
+  // Build the city list from prefs; drop clock 4 if label is blank
+  var clocks = [
+    { label: prefs.wc1Label, offset: prefs.wc1Offset },
+    { label: prefs.wc2Label, offset: prefs.wc2Offset },
+    { label: prefs.wc3Label, offset: prefs.wc3Offset }
+  ];
+  if (prefs.wc4Label && prefs.wc4Label.trim() !== '') {
+    clocks.push({ label: prefs.wc4Label, offset: prefs.wc4Offset });
+  }
+
+  var row = document.getElementById('worldclockRow');
+  if (!row) return;
+
+  // Build tile shells (IDs indexed so tick function can update just the time parts)
+  var html = '';
+  for (var i = 0; i < clocks.length; i++) {
+    html += '<div class="worldclock-tile">'
+      + '<div class="worldclock-city">' + clocks[i].label.toUpperCase() + '</div>'
+      + '<div class="worldclock-time" id="wc_time_' + i + '">--:--</div>'
+      + '<div class="worldclock-ampm" id="wc_ampm_' + i + '">--</div>'
+      + '<div class="worldclock-date" id="wc_date_' + i + '">---</div>'
+      + '<div class="worldclock-offset">' + fmtOffset(clocks[i].offset) + '</div>'
+      + '</div>';
+  }
+  row.innerHTML = html;
+
+  // Store clock config for the tick loop
+  row._wclocks = clocks;
+
+  tickWorldClocks();
+  if (worldClockInterval) clearInterval(worldClockInterval);
+  worldClockInterval = setInterval(tickWorldClocks, 1000);
+}
+
+function tickWorldClocks() {
+  var row = document.getElementById('worldclockRow');
+  if (!row || !row._wclocks) return;
+  var clocks = row._wclocks;
+  for (var i = 0; i < clocks.length; i++) {
+    var d = getTimeForOffset(clocks[i].offset);
+    var timeEl = document.getElementById('wc_time_' + i);
+    var ampmEl = document.getElementById('wc_ampm_' + i);
+    var dateEl = document.getElementById('wc_date_' + i);
+    if (timeEl) timeEl.textContent = fmtWcTime(d);
+    if (ampmEl) ampmEl.textContent = d.getHours() >= 12 ? 'PM' : 'AM';
+    if (dateEl) dateEl.textContent = fmtWcDate(d);
+  }
+}
+
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 applyBottomBlock();
 if (prefs.bottomBlock === 'sports') {
   initSports();
+} else if (prefs.bottomBlock === 'wxforecast') {
+  fetchWxForecast();
+} else if (prefs.bottomBlock === 'worldclock') {
+  buildWorldClockTiles();
 }
 </script>
 </body>
